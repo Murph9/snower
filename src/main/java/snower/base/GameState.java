@@ -25,7 +25,7 @@ public class GameState extends AbstractAppState {
 
         // camera
         Camera cam = m.getCamera();
-        MyChaseCam camera = new MyChaseCam(cam, player.getChar());
+        MyChaseCam camera = new MyChaseCam(cam, player.getChar(), player.getCharNode());
         stateManager.attach(camera);
         
         super.stateAttached(stateManager);

@@ -26,8 +26,8 @@ import com.jme3.scene.Spatial;
 public class Player extends AbstractAppState implements ActionListener {
 
     private final Main m;
-    private CharacterControl player;
-    private Node playerNode;
+    private final CharacterControl player;
+    private final Node playerNode;
     
     private float dirAngle = -FastMath.HALF_PI;
     private float speed;
@@ -37,16 +37,19 @@ public class Player extends AbstractAppState implements ActionListener {
     public Player(Main m) {
         this.m = m;
         this.player = new CharacterControl(new CapsuleCollisionShape(0.5f, 1.8f), 0.6f); // number here is the ground difference required to 'jump'
+        this.playerNode = new Node("character node");
     }
 
     public CharacterControl getChar() {
         return player;
     }
+    public Node getCharNode() {
+        return playerNode;
+    }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         // add player
-        playerNode = new Node("character node");
         Spatial playerG = m.getAssetManager().loadModel("models/stick_snowboarder.obj");
         Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         baseMat.setColor("Color", ColorRGBA.Blue);
@@ -54,7 +57,7 @@ public class Player extends AbstractAppState implements ActionListener {
         playerNode.attachChild(playerG);
         
         player.setJumpSpeed(15);
-        player.setFallSpeed(145);
+        player.setFallSpeed(45);
         player.setGravity(30);
         resetPos();
         
@@ -81,7 +84,7 @@ public class Player extends AbstractAppState implements ActionListener {
         if (up)
             speed = 0.7f;
         else 
-            speed -= 3*tpf;
+            speed -= 0.3*tpf;
         speed = Math.max(speed, 0);
         
         // if (down)
