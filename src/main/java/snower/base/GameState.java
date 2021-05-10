@@ -35,6 +35,8 @@ public class GameState extends AbstractAppState {
     public void stateDetached(AppStateManager stateManager) {
         super.stateDetached(stateManager);
         
-        //TODO remove added states
+        stateManager.detach(stateManager.getState(WorldState.class));
+        stateManager.detach(stateManager.getState(Player.class));
+        stateManager.detach(stateManager.getState(MyChaseCam.class));
     }
 }

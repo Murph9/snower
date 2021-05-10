@@ -50,10 +50,15 @@ public class Main extends SimpleApplication {
         // TODO static class stuff
         getStateManager().attach(new DebugAppState());
 
+        initLighting();
+
         //start game
         gameState = new GameState(this);
         getStateManager().attach(gameState);
 
+    }
+
+    private void initLighting() {
         // TODO stuff that should in another file
         DirectionalLight l = new DirectionalLight();
         l.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
