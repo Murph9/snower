@@ -43,19 +43,15 @@ public class MyChaseCam extends BaseAppState {
         nextPos = wanted.interpolateLocal(nextPos, wanted, tpf*CAMERA_CONST);
 
         c.setLocation(nextPos);
-        c.lookAt(pos, Vector3f.UNIT_Y);
+        c.lookAt(pos.add(0,2f,0), Vector3f.UNIT_Y);
 
         super.render(rm);
     }
         
     /** calculate world pos of a camera */
     private Vector3f getWantedPos(Vector3f pos) {
-        Vector3f localVel = new Vector3f();
-        control.getViewDirection(localVel);
-
-        // TODO calc angle of ground and 'look' down the hill a little better
-
-        return pos.add(localVel.normalize().negate().add(0, 0.4f, 0).mult(new Vector3f(8, 8, 8)));
+        var q = control.getViewRot();
+        return pos.add(q.mult(Vector3f.UNIT_Z).negate().mult(4.5f).add(0, 3f, 0));
     }
 
     // #region unused methods
