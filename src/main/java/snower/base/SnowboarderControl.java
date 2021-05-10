@@ -9,6 +9,7 @@ import com.jme3.scene.Node;
 public class SnowboarderControl extends BetterCharacterControl {
 
     private static final float ROT_SPEED = 2.5f;
+    private static final float SPIN_SPEED = 4.5f;
     
     private float tempRotAmount;
     private float rotAmount;
@@ -25,7 +26,11 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     @Override
     public void update(float tpf) {
-        rotAmount += tempRotAmount*tpf*ROT_SPEED;
+        if (this.isOnGround()) {
+            rotAmount += tempRotAmount*tpf*ROT_SPEED;
+        } else {
+            rotAmount += tempRotAmount*tpf*SPIN_SPEED;
+        }
 
         var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
@@ -48,7 +53,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         applyDrag(tpf);
 
         // apply speed
-        this.setWalkDirection(dir.mult(speed));
+        if (this.isOnGround()) {
+            this.setWalkDirection(dir.mult(speed));
+        }
+        // else this will just keep the speed from the last call
 
         super.update(tpf);
     }
@@ -88,12 +96,13 @@ public class SnowboarderControl extends BetterCharacterControl {
         speed -= slow*tpf;
 
         // TODO this is terrible
-        if (speed > 15) {
-            speed = 15;
-        }
-        // TODO this is even more terrible
         if (speed < 3) {
             speed = 3;
+        }
+        
+        // TODO this is even more terrible
+        if (speed > 15) {
+            speed = 15;
         }
     }
 }
