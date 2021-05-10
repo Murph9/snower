@@ -2,7 +2,6 @@ package snower.base;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.bullet.control.CharacterControl;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
@@ -13,13 +12,13 @@ public class MyChaseCam extends BaseAppState {
     // https://github.com/Murph9/RallyGame/blob/master/src/main/java/rallygame/car/CarCamera.java
     
     private final Camera c;
-    private final CharacterControl control;
+    private final SnowboarderControl control;
     private final Node playerNode;
 
     private Vector3f nextPos;
     private float tpf;
 
-    public MyChaseCam(Camera c, CharacterControl control, Node playerNode) {
+    public MyChaseCam(Camera c, SnowboarderControl control, Node playerNode) {
         this.c = c;
         this.control = control;
         this.playerNode = playerNode;
