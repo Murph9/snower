@@ -13,6 +13,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private float tempRotAmount;
     private float rotAmount;
     
+    private float slow;
     private float speed;
     private Quaternion viewRot;
 
@@ -42,9 +43,9 @@ public class SnowboarderControl extends BetterCharacterControl {
         var grav = this.getGravity(null);
         
         speed += tpf*-FastMath.sin(groundAngle)*grav.length();
-        System.out.println(groundAngle + " | " + speed);
+        
         // calc drag
-        speed = applyDrag(speed);
+        applyDrag(tpf);
 
         // apply speed
         this.setWalkDirection(dir.mult(speed));
@@ -58,9 +59,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public void stop(float amount) {
-
-        // TODO set for higher drag
-        speed = 0;
+        slow = amount;
     }
 
     public Quaternion getViewRot() {
@@ -85,16 +84,16 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     
-    private static float applyDrag(float speed) {
+    private void applyDrag(float tpf) {
+        speed -= slow*tpf;
+
         // TODO this is terrible
-        if (speed > 30) {
-            speed = 30;
+        if (speed > 15) {
+            speed = 15;
         }
         // TODO this is even more terrible
-        if (speed < 1) {
-            speed = 1;
+        if (speed < 3) {
+            speed = 3;
         }
-
-        return speed;
     }
 }

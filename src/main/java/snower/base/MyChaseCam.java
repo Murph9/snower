@@ -10,6 +10,7 @@ import com.jme3.scene.Node;
 public class MyChaseCam extends BaseAppState {
 
     // https://github.com/Murph9/RallyGame/blob/master/src/main/java/rallygame/car/CarCamera.java
+    private static final float CAMERA_CONST = 4;
     
     private final Camera c;
     private final SnowboarderControl control;
@@ -39,18 +40,16 @@ public class MyChaseCam extends BaseAppState {
     public void render(RenderManager rm) {
         Vector3f pos = playerNode.getLocalTranslation();
         Vector3f wanted = getWantedPos(pos);
-        nextPos = wanted.interpolateLocal(nextPos, wanted, tpf);
-        Vector3f nextPlayerPos = pos;
+        nextPos = wanted.interpolateLocal(nextPos, wanted, tpf*CAMERA_CONST);
 
         c.setLocation(nextPos);
-        c.lookAt(nextPlayerPos, Vector3f.UNIT_Y); //TODO not unit y if the char is going down hill
+        c.lookAt(pos, Vector3f.UNIT_Y);
 
         super.render(rm);
     }
         
-    // calculate world pos of a camera
+    /** calculate world pos of a camera */
     private Vector3f getWantedPos(Vector3f pos) {
-        // calculate world pos of a camera
         Vector3f localVel = new Vector3f();
         control.getViewDirection(localVel);
 
