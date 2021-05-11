@@ -84,7 +84,7 @@ public class Player extends AbstractAppState implements ActionListener {
         } else if (binding.equals("Rights")) {
             snower.turn(value ? -1 : 0);
         } else if (binding.equals("Ups")) {
-            //TODO lean forward
+            snower.setDucked(value);
         } else if (binding.equals("Downs")) {
             snower.stop(value ? 1 : 0);
         } else if (binding.equals("Space")) {

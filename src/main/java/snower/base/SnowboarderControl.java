@@ -10,6 +10,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private static final float ROT_SPEED = 2.5f;
     private static final float SPIN_SPEED = 4.5f;
+    private static final float DUCK_MOD = 1.4f;
     
     private float tempRotAmount;
     private float rotAmount;
@@ -110,15 +111,19 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     
     private void applyDrag(float tpf) {
-        speed -= slow*tpf;
+        if (isOnGround())
+            speed -= slow*tpf;
 
-        // TODO this is terrible
+        // TODO check method tobe 'actually' drag related once we like a speed
+
+        // TODO this needs some better logic, see 'me' notes
         if (speed < 3) {
             speed = 3;
         }
         
         // TODO this is even more terrible
-        if (speed > 22) {
+        float duckMod = this.isDucked() ? DUCK_MOD : 1;
+        if (speed > 22 * duckMod) {
             speed = 22;
         }
     }
