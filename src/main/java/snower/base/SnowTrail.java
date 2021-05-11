@@ -48,7 +48,7 @@ public class SnowTrail {
     }
     //#endregion
     
-    private static final ColorRGBA BASE_TRAIL_COLOUR = ColorRGBA.Pink;
+    private static final ColorRGBA BASE_TRAIL_COLOUR = ColorRGBA.Gray;
 
     private final Geometry trailLine;
     private final Vector3f[] vertices;
@@ -94,8 +94,8 @@ public class SnowTrail {
         }
 
         var points = Helper.getMinMaxX(boardExtents);
-        points[0].y += 0.1f; //TODO testing
-        points[1].y += 0.1f;
+        points[0].y += 0.01f;
+        points[1].y += 0.01f;
 
         if (lastL == null || lastR == null) {
             lastL = points[0];
