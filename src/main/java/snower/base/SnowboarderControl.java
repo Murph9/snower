@@ -42,7 +42,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         
         // set angle of character Node based on the floor angle
         this.viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
-        ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot); // hack to get the physical char
+        ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot); // TODO hack to get the physical char rotated to match slope
     
         // calc acceleration
         var grav = this.getGravity(null);
@@ -74,6 +74,23 @@ public class SnowboarderControl extends BetterCharacterControl {
         return viewRot;
     }
 
+    public Vector3f[] getBoardExtents() {
+        final float BOARD_WIDTH = 0.15f;
+        final float BOARD_LENGTH = 1.55f;
+
+        var dir = this.getViewDirection().normalize();
+        dir.multLocal(BOARD_LENGTH/2);
+        var pos = this.getSpatialTranslation();
+        var worldRot = ((Node)this.getSpatial()).getChild(0).getWorldRotation(); //TODO any getChild(0) reference is a hack
+        var extents = new Vector3f[] {
+            worldRot.mult(Vector3f.UNIT_Z.clone().addLocal(BOARD_WIDTH, 0, 0)).addLocal(pos),
+            worldRot.mult(Vector3f.UNIT_Z.clone().addLocal(-BOARD_WIDTH, 0, 0)).addLocal(pos),
+            worldRot.mult(Vector3f.UNIT_Z.clone().negateLocal().addLocal(BOARD_WIDTH, 0, 0)).addLocal(pos),
+            worldRot.mult(Vector3f.UNIT_Z.clone().negateLocal().addLocal(-BOARD_WIDTH, 0, 0)).addLocal(pos)
+        };
+        return extents;
+    }
+
     private float calcCharAngle() {
         var pos = getSpatial().getLocalTranslation();
         var dir = this.getWalkDirection(null).normalizeLocal();
@@ -101,8 +118,8 @@ public class SnowboarderControl extends BetterCharacterControl {
         }
         
         // TODO this is even more terrible
-        if (speed > 15) {
-            speed = 15;
+        if (speed > 22) {
+            speed = 22;
         }
     }
 }

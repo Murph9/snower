@@ -20,10 +20,14 @@ public class Player extends AbstractAppState implements ActionListener {
     private final SnowboarderControl snower;
     private final Node playerNode;
 
+    private final SnowTrail trail;
+
     public Player(Main m) {
         this.m = m;
         this.playerNode = new Node("character node");
         this.snower = new SnowboarderControl();
+
+        this.trail = new SnowTrail(m);
     }
 
     public SnowboarderControl getChar() {
@@ -49,6 +53,8 @@ public class Player extends AbstractAppState implements ActionListener {
         
         Main.physicsSpace.add(snower);
         m.getRootNode().attachChild(playerNode);
+
+        m.getRootNode().attachChild(trail.getGeom());
 
         setupKeys();
         super.initialize(stateManager, app);
@@ -90,5 +96,24 @@ public class Player extends AbstractAppState implements ActionListener {
 
     private void resetPos() {
         snower.warp(new Vector3f(0, 150/2, -360/2));
+    }
+
+    //TODO dispose
+
+    @Override
+    public void update(float tpf) {
+        if (snower.isOnGround()) {
+            var extents = snower.getBoardExtents();
+            trail.viewUpdate(tpf, extents);
+
+            var points = Helper.getMinMaxX(extents);
+            var debug = m.getStateManager().getState(DebugAppState.class);
+            debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
+            debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
+        } else {
+            trail.viewUpdate(tpf, null);
+        }
+
+        super.update(tpf);
     }
 }

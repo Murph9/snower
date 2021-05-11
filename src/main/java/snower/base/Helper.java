@@ -27,4 +27,25 @@ public class Helper {
 
         return -1;
     }
+
+    public static Vector3f[] getMinMaxX(Vector3f ...points) {
+        if (points == null || points.length < 1)
+            return new Vector3f[0];
+        if (points.length == 1)
+            return points;
+
+        Vector3f minX = null;
+        Vector3f maxX = null;
+
+        for (Vector3f v: points) {
+            if (minX == null || v.x < minX.x)
+                minX = v;
+            if (maxX == null || v.x > maxX.x)
+                maxX = v;
+        }
+
+        return new Vector3f[] {
+            minX, maxX
+        };    
+    }
 }

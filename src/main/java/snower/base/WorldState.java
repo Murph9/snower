@@ -31,7 +31,7 @@ public class WorldState extends AbstractAppState {
             // add level
             Geometry base = new Geometry("level", new Box(200, 2, 200));
             Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            baseMat.setColor("Color", ColorRGBA.Gray);
+            baseMat.setColor("Color", ColorRGBA.LightGray);
             base.setMaterial(baseMat);
             base.setLocalTranslation(0, -150*i, 360*i);
             base.setLocalRotation(new Quaternion().fromAngles(FastMath.QUARTER_PI/2, 0, 0));
