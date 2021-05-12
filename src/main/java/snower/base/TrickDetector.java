@@ -29,9 +29,13 @@ public class TrickDetector {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            for (Trick t: tricks) {
-                sb.append(t);
-                sb.append(", ");
+            if (tricks.length < 1) {
+                return "";
+            }
+            sb.append(tricks[0]);
+            for (int i = 1; i < tricks.length; i++) {
+                sb.append(" + ");
+                sb.append(tricks[i]);
             }
             return sb.toString();
         }
@@ -58,7 +62,7 @@ public class TrickDetector {
             if (grab != null) {
                 sb.append(grab);
             }
-            return sb.toString();
+            return sb.toString().trim();
         }
     }
     private Trick curTrick;
@@ -74,24 +78,24 @@ public class TrickDetector {
         rotAngle += dRotAngle;
         flipAngle += dFlipAngle;
 
-        if (rotAngle > FastMath.HALF_PI) {
+        if (rotAngle > FastMath.PI) {
             curTrick.spins++;
-            rotAngle -= FastMath.HALF_PI;
+            rotAngle -= FastMath.PI;
         }
 
-        if (rotAngle < -FastMath.HALF_PI) {
+        if (rotAngle < -FastMath.PI) {
             curTrick.spins++;
-            rotAngle += FastMath.HALF_PI;
+            rotAngle += FastMath.PI;
         }
 
-        if (flipAngle > FastMath.PI) {
+        if (flipAngle > FastMath.TWO_PI) {
             curTrick.frontFlips++;
-            flipAngle -= FastMath.PI;
+            flipAngle -= FastMath.TWO_PI;
         }
 
-        if (flipAngle < -FastMath.PI) {
+        if (flipAngle < -FastMath.TWO_PI) {
             curTrick.backFlips++;
-            flipAngle += FastMath.PI;
+            flipAngle += FastMath.TWO_PI;
         }
     }
     public void grab(String name) {
@@ -105,6 +109,17 @@ public class TrickDetector {
     }
 
     public TrickList stop() {
+        // some leniency
+        // within 10 percent
+        final float LENIENCY = 1 - 0.1f;
+        if (Math.abs(rotAngle) > FastMath.PI*LENIENCY)
+            curTrick.spins++;
+        if (flipAngle > FastMath.TWO_PI*LENIENCY)
+            curTrick.frontFlips++;
+        if (flipAngle < -FastMath.TWO_PI*LENIENCY)
+            curTrick.backFlips++;
+
+        System.out.println(tricks);
         var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
         return new TrickList(validTricks.toArray(new Trick[0]));
     }

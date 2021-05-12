@@ -59,7 +59,8 @@ public class SnowboarderControl extends BetterCharacterControl {
 
             if (detector != null) {
                 var result = detector.stop();
-                this.trickBuffer.add(result);
+                if (result.hasTricks())
+                    this.trickBuffer.add(result);
                 detector = null;
             }
         } else {

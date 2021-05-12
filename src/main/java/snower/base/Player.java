@@ -96,6 +96,7 @@ public class Player extends AbstractAppState implements ActionListener {
     private void resetPos() {
         var world = m.getStateManager().getState(WorldState.class);
         snower.warp(world.startPos());
+        snower.reset();
     }
 
     @Override

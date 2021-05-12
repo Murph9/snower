@@ -66,7 +66,6 @@ public class BoardingUI extends AbstractAppState {
              // buffer calling the tricks to display them
             var trick = control.getTrick();
             if (trick != null) {
-                System.out.println("Got trick " + trick);
                 this.trickText.setText(trick.toString());
                 this.trickTextTimer = TRICK_MESSAGE_TIMEOUT;
             }
