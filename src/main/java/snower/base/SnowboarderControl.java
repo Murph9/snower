@@ -39,7 +39,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         // calc angle of ground
         var groundAngle = calcCharAngle();
         if (Float.isNaN(groundAngle)) //i.e. too far from slope to find it
-            groundAngle = 0; // TODO smooth this and predict landing slope after jump
+            groundAngle = 0; // TODO smooth this
         
         // set angle of character Node based on the floor angle
         this.viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
@@ -94,7 +94,14 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private float calcCharAngle() {
         var pos = getSpatial().getLocalTranslation();
-        var dir = this.getWalkDirection(null).normalizeLocal();
+        var dir = getSpatial().getWorldTransform().getRotation().mult(Vector3f.UNIT_Z).normalizeLocal();
+
+        // 'predict' the location of the ground
+        if (!isOnGround()) {
+            var findPos = Helper.findFirstPosDown(pos, 500, this.getRigidBody());
+            if (findPos != null)
+                pos = findPos;
+        }
 
         // calc angle of char
         var frontPos = pos.add(dir).add(0, 1, 0);

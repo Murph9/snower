@@ -10,11 +10,25 @@ import com.jme3.math.Vector3f;
 
 public class Helper {
     
+    public static Vector3f findFirstPosDown(final Vector3f from, float rayLength, PhysicsCollisionObject self) {
+        Vector3f to = new Vector3f(from.x, from.y - rayLength, from.z);
+        List<PhysicsRayTestResult> results = new ArrayList<>();
+        Main.physicsSpace.rayTest(from, to, results);
+        for (PhysicsRayTestResult result : results) {
+            if (result.getCollisionObject().getObjectId() == self.getObjectId())
+                continue; // no self collision please
+            if (!(result.getCollisionObject() instanceof PhysicsRigidBody))
+                continue;
+            return from.add(to.mult(result.getHitFraction()));
+        }
+
+        return null;
+    }
+
     public static float findHeight(final Vector3f from, float rayLength, PhysicsCollisionObject self) {
         Vector3f to = new Vector3f(from.x, from.y - rayLength, from.z);
         List<PhysicsRayTestResult> results = new ArrayList<>();
         Main.physicsSpace.rayTest(from, to, results);
-        float height = rayLength;
         for (PhysicsRayTestResult result : results) {
             if (result.getCollisionObject().getObjectId() == self.getObjectId())
                 continue; // no self collision please
@@ -22,7 +36,7 @@ public class Helper {
                 continue;
 
             float intersection = result.getHitFraction() * rayLength;
-            return Math.min(height, intersection);
+            return Math.min(rayLength, intersection);
         }
 
         return -1;
