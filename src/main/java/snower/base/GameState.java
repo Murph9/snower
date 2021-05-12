@@ -25,7 +25,7 @@ public class GameState extends AbstractAppState {
 
         // camera
         Camera cam = m.getCamera();
-        MyChaseCam camera = new MyChaseCam(cam, player.getChar(), player.getCharNode());
+        PullCam camera = new PullCam(cam, player.getCharNode());
         stateManager.attach(camera);
 
         BoardingUI ui = new BoardingUI(player.getChar());
@@ -41,6 +41,6 @@ public class GameState extends AbstractAppState {
         stateManager.detach(stateManager.getState(BoardingUI.class));
         stateManager.detach(stateManager.getState(WorldState.class));
         stateManager.detach(stateManager.getState(Player.class));
-        stateManager.detach(stateManager.getState(MyChaseCam.class));
+        stateManager.detach(stateManager.getState(PullCam.class));
     }
 }

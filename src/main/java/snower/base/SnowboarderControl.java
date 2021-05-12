@@ -39,8 +39,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         // calc angle of ground
         var groundAngle = calcCharAngle();
         if (Float.isNaN(groundAngle)) //i.e. too far from slope to find it
-            groundAngle = 0; // TODO smooth this
-        
+            groundAngle = 0; // TODO smooth ground angle
         // set angle of character Node based on the floor angle
         this.viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
         ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot); // TODO hack to get the physical char rotated to match slope
