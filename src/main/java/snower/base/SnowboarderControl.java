@@ -76,7 +76,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             detector.update(tempRotAmount*tpf*SPIN_SPEED, tempFlipAmount*tpf*SPIN_SPEED/2);
         }
         
-        var dir = Quaternion.IDENTITY.fromAngles(flipAmount, rotAmount, 0).mult(Vector3f.UNIT_X);
+        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
  
         // calc angle of ground
@@ -104,9 +104,19 @@ public class SnowboarderControl extends BetterCharacterControl {
         super.update(tpf);
     }
 
+    public void reset() {
+        this.speed = 0;
+        this.rotAmount = 0;
+        this.flipAmount = 0;
+        this.trickBuffer.clear();
+    }
 
     public void turn(float amount) {
         tempRotAmount = amount;
+    }
+
+    public void flip(float amount) {
+        tempFlipAmount = amount;
     }
 
     public void stop(float amount) {
