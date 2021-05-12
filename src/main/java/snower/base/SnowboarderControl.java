@@ -1,12 +1,21 @@
 package snower.base;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 
+import snower.base.TrickDetector.TrickList;
+
 public class SnowboarderControl extends BetterCharacterControl {
+
+    private static final float MASS = 75;
+    private static final float GRAV_FALLING = 15;
+    private static final float GRAV_GROUND = 40;
 
     private static final float ROT_SPEED = 2.5f;
     private static final float SPIN_SPEED = 4.5f;
@@ -14,30 +23,60 @@ public class SnowboarderControl extends BetterCharacterControl {
     
     private float tempRotAmount;
     private float rotAmount;
-    
-    private float slow;
+    private float tempFlipAmount;
+    private float flipAmount;
+
     private float speed;
-    
     private float slow;
+
     private float groundAngle;
+    private boolean crashing;
 
-
+    private Queue<TrickList> trickBuffer = new LinkedList<>();
+    private TrickDetector detector;
+    
     public SnowboarderControl() {
-        super(0.5f, 1.8f, 75);
+        super(0.5f, 1.8f, MASS);
 
-        viewRot = new Quaternion();
+        setGravity(new Vector3f(0, -GRAV_FALLING, 0));
+        setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
+    }
+
+    public TrickList getTrick() {
+        return this.trickBuffer.poll();
     }
 
     @Override
     public void update(float tpf) {
-        if (this.isOnGround()) { //TODO handle with state machine
+        //TODO handle rotation types with a state machine?
+        
+        if (isOnGround()) {
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
+            
+            // stick character to the ground to prevent annoying jumping
+            setGravity(new Vector3f(0, -GRAV_GROUND, 0));
+
+            if (detector != null) {
+                var result = detector.stop();
+                this.trickBuffer.add(result);
+                detector = null;
+            }
         } else {
             rotAmount += tempRotAmount*tpf*SPIN_SPEED;
-        }
-        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount, 0).mult(Vector3f.UNIT_X);
-        setViewDirection(dir);
+            flipAmount += tempFlipAmount*tpf*SPIN_SPEED/2;
+            
+            setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
+            if (detector == null) {
+                detector = new TrickDetector();
+            }
+
+            detector.update(tempRotAmount*tpf*SPIN_SPEED, tempFlipAmount*tpf*SPIN_SPEED/2);
+        }
+        
+        var dir = Quaternion.IDENTITY.fromAngles(flipAmount, rotAmount, 0).mult(Vector3f.UNIT_X);
+        setViewDirection(dir);
+ 
         // calc angle of ground
         var newGroundAngle = calcCharAngle();
         if (Float.isNaN(newGroundAngle)) //i.e. too far from slope to find it
@@ -49,8 +88,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     
         // calc acceleration
         var grav = this.getGravity(null);
-        
-        speed += tpf*-FastMath.sin(groundAngle)*grav.length();
+        speed += tpf*-FastMath.sin(groundAngle)*grav.length(); //TODO changing gravity changes this too much
         
         // calc drag
         applyDrag(tpf);
@@ -99,6 +137,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         var dir = getSpatial().getWorldTransform().getRotation().mult(Vector3f.UNIT_Z).normalizeLocal();
 
         // 'predict' the location of the ground
+        // TODO this could just happen all the time, just ignore weird large angles (like board height differences of more than 10m)
         if (!isOnGround()) {
             var findPos = Helper.findFirstPosDown(pos, 500, this.getRigidBody());
             if (findPos != null)
@@ -122,7 +161,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private void applyDrag(float tpf) {
         if (isOnGround())
             speed -= slow*tpf;
-
+        
         float duckSpeed = this.isDucked() ? DUCK_MOD : 1;
 
         // TODO check method tobe 'actually' drag related once we like a speed
@@ -133,8 +172,8 @@ public class SnowboarderControl extends BetterCharacterControl {
         }
         
         // TODO this is even more terrible
-        if (speed > 22 * duckSpeed) {
-            speed = 22 * duckSpeed;
+        if (speed > 45 * duckSpeed) {
+            speed = 45 * duckSpeed;
         }
     }
 }
