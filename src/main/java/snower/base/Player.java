@@ -9,7 +9,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -95,10 +94,21 @@ public class Player extends AbstractAppState implements ActionListener {
     }
 
     private void resetPos() {
-        snower.warp(new Vector3f(0, 150/2, -360/2));
+        var world = m.getStateManager().getState(WorldState.class);
+        snower.warp(world.startPos());
     }
 
-    //TODO dispose
+    @Override
+    public void stateDetached(AppStateManager stateManager) {
+        Main.physicsSpace.remove(snower);
+        m.getRootNode().detachChild(playerNode);
+        m.getRootNode().detachChild(trail.getGeom());
+
+        InputManager im = m.getInputManager();
+        im.removeListener(this);
+
+        super.stateDetached(stateManager);
+    }
 
     @Override
     public void update(float tpf) {

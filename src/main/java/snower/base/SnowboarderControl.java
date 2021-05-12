@@ -17,7 +17,10 @@ public class SnowboarderControl extends BetterCharacterControl {
     
     private float slow;
     private float speed;
-    private Quaternion viewRot;
+    
+    private float slow;
+    private float groundAngle;
+
 
     public SnowboarderControl() {
         super(0.5f, 1.8f, 75);
@@ -27,21 +30,21 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     @Override
     public void update(float tpf) {
-        if (this.isOnGround()) {
+        if (this.isOnGround()) { //TODO handle with state machine
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
         } else {
             rotAmount += tempRotAmount*tpf*SPIN_SPEED;
         }
-
         var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
 
         // calc angle of ground
-        var groundAngle = calcCharAngle();
-        if (Float.isNaN(groundAngle)) //i.e. too far from slope to find it
-            groundAngle = 0; // TODO smooth ground angle
+        var newGroundAngle = calcCharAngle();
+        if (Float.isNaN(newGroundAngle)) //i.e. too far from slope to find it
+            newGroundAngle = 0;
+        groundAngle = FastMath.interpolateLinear(10*tpf, groundAngle, newGroundAngle);
         // set angle of character Node based on the floor angle
-        this.viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
+        var viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
         ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot); // TODO hack to get the physical char rotated to match slope
     
         // calc acceleration
@@ -71,7 +74,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public Quaternion getViewRot() {
-        return viewRot;
+        return new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
     }
 
     public Vector3f[] getBoardExtents() {
@@ -120,17 +123,18 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (isOnGround())
             speed -= slow*tpf;
 
+        float duckSpeed = this.isDucked() ? DUCK_MOD : 1;
+
         // TODO check method tobe 'actually' drag related once we like a speed
 
         // TODO this needs some better logic, see 'me' notes
-        if (speed < 3) {
-            speed = 3;
+        if (speed < 3 * duckSpeed) {
+            speed = 3 * duckSpeed;
         }
         
         // TODO this is even more terrible
-        float duckMod = this.isDucked() ? DUCK_MOD : 1;
-        if (speed > 22 * duckMod) {
-            speed = 22;
+        if (speed > 22 * duckSpeed) {
+            speed = 22 * duckSpeed;
         }
     }
 }

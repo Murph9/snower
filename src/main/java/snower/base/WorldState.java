@@ -10,6 +10,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
@@ -21,6 +22,10 @@ public class WorldState extends AbstractAppState {
 
     public WorldState(Main m) {
         this.m = m;
+    }
+
+    public Vector3f startPos() {
+        return new Vector3f(0, 150/2, -360/2);
     }
 
     @Override

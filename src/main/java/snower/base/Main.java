@@ -32,7 +32,7 @@ public class Main extends SimpleApplication {
 
         //remove the default keys
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_HIDE_STATS);
-        inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_CAMERA_POS); //TODO doesn't work
+        inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_CAMERA_POS); //doesn't work
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_MEMORY);
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
         
@@ -59,7 +59,6 @@ public class Main extends SimpleApplication {
     }
 
     private void initLighting() {
-        // TODO stuff that should in another file
         DirectionalLight l = new DirectionalLight();
         l.setDirection(new Vector3f(-1, -1, -1).normalizeLocal());
         rootNode.addLight(l);
