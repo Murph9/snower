@@ -14,7 +14,7 @@ import snower.base.TrickDetector.TrickList;
 public class SnowboarderControl extends BetterCharacterControl {
 
     private static final float MASS = 75;
-    private static final float GRAV_FALLING = 15;
+    private static final float GRAV_FALLING = 20;
     private static final float GRAV_GROUND = 40;
 
     private static final float ROT_SPEED = 2.5f;
@@ -38,7 +38,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     public SnowboarderControl() {
         super(0.5f, 1.8f, MASS);
 
-        setGravity(new Vector3f(0, -GRAV_FALLING, 0));
+        setGravity(new Vector3f(0, -GRAV_GROUND, 0));
         setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
     }
 
@@ -54,7 +54,8 @@ public class SnowboarderControl extends BetterCharacterControl {
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
             
             // stick character to the ground to prevent annoying jumping
-            setGravity(new Vector3f(0, -GRAV_GROUND, 0));
+            // also ignore the BetterCharacterControl gravity setting
+            getRigidBody().setGravity(new Vector3f(0, -GRAV_GROUND, 0));
 
             if (detector != null) {
                 var result = detector.stop();
@@ -65,7 +66,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             rotAmount += tempRotAmount*tpf*SPIN_SPEED;
             flipAmount += tempFlipAmount*tpf*SPIN_SPEED/2;
             
-            setGravity(new Vector3f(0, -GRAV_FALLING, 0));
+            getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
             if (detector == null) {
                 detector = new TrickDetector();
