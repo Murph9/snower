@@ -23,8 +23,10 @@ public class SnowboarderControl extends BetterCharacterControl {
     
     private float tempRotAmount;
     private float rotAmount;
-    private float tempFlipAmount;
-    private float flipAmount;
+
+    private float tempAirFlipAmount;
+    private float airRotAmount;
+    private float airFlipAmount;
 
     private float speed;
     private float slow;
@@ -48,35 +50,45 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     @Override
     public void update(float tpf) {
-        //TODO handle rotation types with a state machine?
-        
         if (isOnGround()) {
+            // stick character to the ground to prevent annoying jumping
+            // also ignore the BetterCharacterControl gravity setting, its confusingly broken here
+            getRigidBody().setGravity(new Vector3f(0, -GRAV_GROUND, 0));
+            
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
             
-            // stick character to the ground to prevent annoying jumping
-            // also ignore the BetterCharacterControl gravity setting
-            getRigidBody().setGravity(new Vector3f(0, -GRAV_GROUND, 0));
-
             if (detector != null) {
                 var result = detector.stop();
-                if (result.hasTricks())
+                if (result != null && result.hasTricks())
                     this.trickBuffer.add(result);
                 detector = null;
+
+                // trigger landing things
+                airRotAmount = 0;
+                airFlipAmount = 0;
+                
+                if (result.failed) {
+                    speed = 1; // TODO better with animations and failure and what not
+                }
+
+                // TODO figure out switch stance when its 180*360x (this also applies to going too slow, so method pls)
             }
         } else {
-            rotAmount += tempRotAmount*tpf*SPIN_SPEED;
-            flipAmount += tempFlipAmount*tpf*SPIN_SPEED/2;
-            
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
+            var dtAirRot = tempRotAmount*tpf*SPIN_SPEED;
+            var dtAirFlip = tempAirFlipAmount*tpf*SPIN_SPEED/2;
+            airRotAmount += dtAirRot;
+            airFlipAmount += dtAirFlip;
+            
             if (detector == null) {
                 detector = new TrickDetector();
             }
 
-            detector.update(tempRotAmount*tpf*SPIN_SPEED, tempFlipAmount*tpf*SPIN_SPEED/2);
+            detector.update(dtAirRot, dtAirFlip);
         }
         
-        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount, 0).mult(Vector3f.UNIT_X);
+        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount+airRotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
  
         // calc angle of ground
@@ -86,7 +98,8 @@ public class SnowboarderControl extends BetterCharacterControl {
         groundAngle = FastMath.interpolateLinear(10*tpf, groundAngle, newGroundAngle);
         // set angle of character Node based on the floor angle
         var viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
-        ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot); // TODO hack to get the physical char rotated to match slope
+        var flipRot = new Quaternion().fromAngleAxis(airFlipAmount, Vector3f.UNIT_X);
+        ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot.mult(flipRot)); // TODO hack to get the physical char rotated to match slope
     
         // calc acceleration
         var grav = this.getGravity(null);
@@ -107,7 +120,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     public void reset() {
         this.speed = 0;
         this.rotAmount = 0;
-        this.flipAmount = 0;
+        this.airFlipAmount = 0;
         this.trickBuffer.clear();
     }
 
@@ -116,7 +129,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public void flip(float amount) {
-        tempFlipAmount = amount;
+        tempAirFlipAmount = amount;
     }
 
     public void stop(float amount) {

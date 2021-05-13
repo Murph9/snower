@@ -85,14 +85,18 @@ public class Player extends AbstractAppState implements ActionListener {
         } else if (binding.equals("Ups")) {
             if (snower.isOnGround()) {
                 snower.setDucked(value);
+                snower.flip(0);
             } else {
                 snower.flip(value ? 1 : 0);
+                snower.setDucked(false);
             }
         } else if (binding.equals("Downs")) {
             if (snower.isOnGround()) {
                 snower.stop(value ? 1 : 0);
+                snower.flip(0);
             } else {
                 snower.flip(value ? -1 : 0);
+                snower.stop(0);
             }
         } else if (binding.equals("Space")) {
             if (value) snower.jump();

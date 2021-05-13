@@ -14,9 +14,14 @@ public class TrickDetector {
 
     class TrickList {
         private Trick[] tricks;
+        public final boolean failed;
 
         public TrickList(Trick ...tricks) {
+            this(false, tricks);
+        }
+        public TrickList(boolean failed, Trick ...tricks) {
             this.tricks = tricks;
+            this.failed = failed;
         }
 
         public boolean hasTricks() {
@@ -28,14 +33,19 @@ public class TrickDetector {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
             if (tricks.length < 1) {
-                return "";
+                return "[" + (this.failed ? "Failed" : "") +"]";
             }
+            
+            StringBuilder sb = new StringBuilder();
             sb.append(tricks[0]);
             for (int i = 1; i < tricks.length; i++) {
                 sb.append(" + ");
                 sb.append(tricks[i]);
+            }
+            
+            if (this.failed) {
+                sb.append(": Failed");
             }
             return sb.toString();
         }
@@ -109,18 +119,27 @@ public class TrickDetector {
     }
 
     public TrickList stop() {
-        // some leniency
-        // within 10 percent
-        final float LENIENCY = 1 - 0.1f;
-        if (Math.abs(rotAngle) > FastMath.PI*LENIENCY)
+        // some leniency, and set to 0 to show we landed correctly (on the last trick only)
+        final float FRACTION = 0.1f; // within 10 percent
+        final float LENIENCY = 1 - FRACTION;
+        if (Math.abs(rotAngle) > FastMath.PI*LENIENCY) {
             curTrick.spins++;
-        if (flipAngle > FastMath.TWO_PI*LENIENCY)
+            rotAngle = 0;
+        }
+        if (flipAngle > FastMath.TWO_PI*LENIENCY) {
             curTrick.frontFlips++;
-        if (flipAngle < -FastMath.TWO_PI*LENIENCY)
+            flipAngle = 0;
+        }
+        if (flipAngle < -FastMath.TWO_PI*LENIENCY) {
             curTrick.backFlips++;
-
-        System.out.println(tricks);
+            flipAngle = 0;
+        }
+        var failed = Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
+        
+        
         var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
-        return new TrickList(validTricks.toArray(new Trick[0]));
+        var trickList = new TrickList(failed, validTricks.toArray(new Trick[0]));
+        System.out.println(trickList);
+        return trickList;
     }
 }
