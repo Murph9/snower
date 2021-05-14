@@ -19,6 +19,8 @@ import snower.service.GrabListener;
 
 public class Player extends AbstractAppState implements ActionListener {
 
+    private static final ColorRGBA BASE_COLOUR = ColorRGBA.Blue;
+
     private final Main m;
     private final SnowboarderControl snower;
     private final Node playerNode;
@@ -48,7 +50,7 @@ public class Player extends AbstractAppState implements ActionListener {
         // add player
         Spatial playerG = m.getAssetManager().loadModel("models/stick_snowboarder.obj");
         Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        baseMat.setColor("Color", ColorRGBA.Blue);
+        baseMat.setColor("Color", BASE_COLOUR);
         playerG.setMaterial(baseMat);
         playerNode.attachChild(playerG);
         resetPos();
