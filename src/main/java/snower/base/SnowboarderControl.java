@@ -32,6 +32,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private float slow;
 
     private float groundAngle;
+    private boolean switchStance;
     private boolean crashing;
 
     private Queue<TrickList> trickBuffer = new LinkedList<>();
@@ -59,8 +60,11 @@ public class SnowboarderControl extends BetterCharacterControl {
             
             if (detector != null) {
                 var result = detector.stop();
-                if (result != null && result.hasTricks())
+                if (result != null && result.hasTricks()) {
                     this.trickBuffer.add(result);
+                    if (!result.stillFacingTheSameWay())
+                        switchStance = !switchStance;
+                }
                 detector = null;
 
                 // trigger landing things

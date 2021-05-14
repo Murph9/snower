@@ -30,6 +30,13 @@ public class TrickDetector {
         public Trick[] getTricks() {
             return tricks;
         }
+        public boolean stillFacingTheSameWay() {
+            int spins = 0;
+            for (Trick t: this.tricks) {
+                spins += t.spins;
+            }
+            return spins % 2 == 0;
+        }
 
         @Override
         public String toString() {
