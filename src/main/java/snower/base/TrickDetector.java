@@ -119,7 +119,7 @@ public class TrickDetector {
             if (curTrick.grab.equals(name))
                 return; //don't update the same grab
             if (name == null)
-                return; //don't void the previous trick's grab
+                return; //don't void the previous trick's grab with no grab
             
             curTrick = new Trick();
             curTrick.grab = name;
@@ -147,7 +147,6 @@ public class TrickDetector {
         
         var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
         var trickList = new TrickList(failed, validTricks.toArray(new Trick[0]));
-        System.out.println(trickList);
         return trickList;
     }
 }

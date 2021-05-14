@@ -11,6 +11,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -80,7 +81,7 @@ public class Player extends AbstractAppState implements ActionListener {
         var grabs = new LinkedList<Grab>();
         grabs.add(new Grab(KeyInput.KEY_1, "DownGrab"));
         grabs.add(new Grab(KeyInput.KEY_2, "UpGrab"));
-        this.grabListener = new GrabListener(im, KeyInput.KEY_LSHIFT, grabs.toArray(new Grab[0]));
+        this.grabListener = new GrabListener(this, im, KeyInput.KEY_LSHIFT, grabs.toArray(new Grab[0]));
     }
 
     @Override
@@ -116,8 +117,6 @@ public class Player extends AbstractAppState implements ActionListener {
         var world = m.getStateManager().getState(WorldState.class);
         snower.warp(world.startPos());
         snower.reset();
-        if (grabListener != null)
-            grabListener.landed();
     }
 
     @Override
@@ -144,19 +143,21 @@ public class Player extends AbstractAppState implements ActionListener {
             var debug = m.getStateManager().getState(DebugAppState.class);
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
-
-            grabListener.landed();
         } else {
             trail.viewUpdate(tpf, null);
-
-            var action = grabListener.getAction();
-            if (action != null) {
-                this.snower.grab(action.name);
-            } else {
-                this.snower.grab(null);
-            }
         }
 
         super.update(tpf);
+    }
+
+    public void grabbed(Grab action) {
+        var geom = (Geometry)playerNode.getChild(0);
+        var mat = geom.getMaterial();
+
+        var grabName = action == null ? null : action.name;
+        this.snower.grab(grabName);
+
+        // TODO hack to see grabs work without animations
+        mat.setColor("Color", action != null ? ColorRGBA.White : BASE_COLOUR);
     }
 }

@@ -7,14 +7,20 @@ import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 
+import snower.base.Player;
+
 public class GrabListener implements ActionListener {
     
     private static final String BASE_ACTION = "BaseAction";
+
+    private final Player player; //TODO this shouldn't be a dependency
+
     private final HashMap<String, Grab> grabKeys;
     private boolean baseKeyPressed;
-    private String curAction;
 
-    public GrabListener(InputManager im, int baseKey, Grab ...grabs) {
+    public GrabListener(Player player, InputManager im, int baseKey, Grab ...grabs) {
+        this.player = player;
+        
         im.addMapping(BASE_ACTION, new KeyTrigger(baseKey));
         im.addListener(this, BASE_ACTION);
 
@@ -40,29 +46,18 @@ public class GrabListener implements ActionListener {
         if (name.equals(BASE_ACTION)) {
             baseKeyPressed = isPressed;
             if (!isPressed) {
-                curAction = null; //let go when removed
+                this.player.grabbed(null);
             }
         }
         
         if (baseKeyPressed) { //base key + has stopped pressing base key
             for (Entry<String, Grab> grab: grabKeys.entrySet()) {
                 if (isPressed && name.equals(grab.getKey())) {
-                    curAction = name;
                     baseKeyPressed = false; // need to let go of the grab button to continue
+                    this.player.grabbed(grabKeys.get(name));
                     break;
                 }
             }
         }
-    }
-
-    public void landed() {
-        this.curAction = null;
-        this.baseKeyPressed = false;
-    }
-
-    public Grab getAction() {
-        if (curAction == null)
-            return null;
-        return grabKeys.get(curAction);
     }
 }
