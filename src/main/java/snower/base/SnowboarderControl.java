@@ -100,11 +100,17 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (Float.isNaN(newGroundAngle)) //i.e. too far from slope to find it
             newGroundAngle = 0;
         groundAngle = FastMath.interpolateLinear(10*tpf, groundAngle, newGroundAngle);
+        
         // set angle of character Node based on the floor angle
-        var viewRot = new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
-        var flipRot = new Quaternion().fromAngleAxis(airFlipAmount, Vector3f.UNIT_X);
-        ((Node)getSpatial()).getChild(0).setLocalRotation(viewRot.mult(flipRot)); // TODO hack to get the physical char rotated to match slope
-    
+        Quaternion rot;
+        if (this.switchStance) {
+            rot = new Quaternion().fromAngles(- airFlipAmount + groundAngle, FastMath.PI, 0);
+        } else {
+            rot = new Quaternion().fromAngles(airFlipAmount - groundAngle, 0, 0);
+        }
+        ((Node)getSpatial()).getChild(0).setLocalRotation(rot); // TODO hack to get the physical char rotated to match slope
+        
+
         // calc acceleration
         var grav = this.getGravity(null);
         speed += tpf*-FastMath.sin(groundAngle)*grav.length(); //TODO changing gravity changes this too much
@@ -210,5 +216,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (speed > 45 * duckSpeed) {
             speed = 45 * duckSpeed;
         }
+
+        // TODO change switch stance when losing speed going up hill
     }
 }
