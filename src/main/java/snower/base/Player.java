@@ -116,6 +116,8 @@ public class Player extends AbstractAppState implements ActionListener {
         var world = m.getStateManager().getState(WorldState.class);
         snower.warp(world.startPos());
         snower.reset();
+        if (grabListener != null)
+            grabListener.landed();
     }
 
     @Override

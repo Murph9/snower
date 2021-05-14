@@ -75,6 +75,8 @@ public class TrickDetector {
             return sb.toString().trim();
         }
     }
+    
+    private boolean inTrick;
     private Trick curTrick;
     private List<Trick> tricks;
 
@@ -109,12 +111,16 @@ public class TrickDetector {
         }
     }
     public void grab(String name) {
+        inTrick = name != null;
+
         if (curTrick.grab == null) {
             curTrick.grab = name;
         } else {
             if (curTrick.grab.equals(name))
                 return; //don't update the same grab
-
+            if (name == null)
+                return; //don't void the previous trick's grab
+            
             curTrick = new Trick();
             curTrick.grab = name;
             tricks.add(curTrick);
@@ -123,7 +129,7 @@ public class TrickDetector {
 
     public TrickList stop() {
         // some leniency, and set to 0 to show we landed correctly (on the last trick only)
-        final float FRACTION = 0.1f; // within 10 percent
+        final float FRACTION = 0.2f; // within 10 percent
         final float LENIENCY = 1 - FRACTION;
         if (Math.abs(rotAngle) > FastMath.PI*LENIENCY) {
             curTrick.spins++;
@@ -137,8 +143,7 @@ public class TrickDetector {
             curTrick.backFlips++;
             flipAngle = 0;
         }
-        var failed = Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
-        failed |= this.curTrick.grab != null; // didn't let go of grab
+        var failed = inTrick || Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
         
         var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
         var trickList = new TrickList(failed, validTricks.toArray(new Trick[0]));
