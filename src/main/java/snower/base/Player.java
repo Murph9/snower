@@ -1,6 +1,7 @@
 package snower.base;
 
-import com.jme3.app.Application;
+import java.util.LinkedList;
+
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.InputManager;
@@ -13,6 +14,9 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import snower.service.Grab;
+import snower.service.GrabListener;
+
 public class Player extends AbstractAppState implements ActionListener {
 
     private final Main m;
@@ -20,6 +24,8 @@ public class Player extends AbstractAppState implements ActionListener {
     private final Node playerNode;
 
     private final SnowTrail trail;
+
+    private GrabListener grabListener;
 
     public Player(Main m) {
         this.m = m;
@@ -38,7 +44,7 @@ public class Player extends AbstractAppState implements ActionListener {
     }
 
     @Override
-    public void initialize(AppStateManager stateManager, Application app) {
+    public void stateAttached(AppStateManager stateManager) {
         // add player
         Spatial playerG = m.getAssetManager().loadModel("models/stick_snowboarder.obj");
         Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -56,7 +62,6 @@ public class Player extends AbstractAppState implements ActionListener {
         m.getRootNode().attachChild(trail.getGeom());
 
         setupKeys();
-        super.initialize(stateManager, app);
     }
 
     private void setupKeys() {
@@ -68,12 +73,12 @@ public class Player extends AbstractAppState implements ActionListener {
         im.addMapping("Space", new KeyTrigger(KeyInput.KEY_SPACE));
         im.addMapping("Reset", new KeyTrigger(KeyInput.KEY_RETURN));
 
-        im.addListener(this,"Lefts");
-        im.addListener(this,"Rights");
-        im.addListener(this,"Ups");
-        im.addListener(this,"Downs");
-        im.addListener(this,"Space");
-        im.addListener(this,"Reset");
+        im.addListener(this,"Lefts", "Rights", "Ups", "Downs", "Space", "Reset");
+
+        var grabs = new LinkedList<Grab>();
+        grabs.add(new Grab(KeyInput.KEY_1, "DownGrab"));
+        grabs.add(new Grab(KeyInput.KEY_2, "UpGrab"));
+        this.grabListener = new GrabListener(im, KeyInput.KEY_LSHIFT, grabs.toArray(new Grab[0]));
     }
 
     @Override
@@ -120,6 +125,8 @@ public class Player extends AbstractAppState implements ActionListener {
         InputManager im = m.getInputManager();
         im.removeListener(this);
 
+        grabListener.deregister(im);
+
         super.stateDetached(stateManager);
     }
 
@@ -133,8 +140,17 @@ public class Player extends AbstractAppState implements ActionListener {
             var debug = m.getStateManager().getState(DebugAppState.class);
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
+
+            grabListener.landed();
         } else {
             trail.viewUpdate(tpf, null);
+
+            var action = grabListener.getAction();
+            if (action != null) {
+                this.snower.grab(action.name);
+            } else {
+                this.snower.grab(null);
+            }
         }
 
         super.update(tpf);

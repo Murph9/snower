@@ -132,6 +132,12 @@ public class SnowboarderControl extends BetterCharacterControl {
         tempAirFlipAmount = amount;
     }
 
+    public void grab(String name) {
+        if (name == null && detector == null)
+            return;
+        this.detector.grab(name);
+    }
+
     public void stop(float amount) {
         slow = amount;
     }

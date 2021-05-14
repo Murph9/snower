@@ -112,6 +112,9 @@ public class TrickDetector {
         if (curTrick.grab == null) {
             curTrick.grab = name;
         } else {
+            if (curTrick.grab.equals(name))
+                return; //don't update the same grab
+
             curTrick = new Trick();
             curTrick.grab = name;
             tricks.add(curTrick);
@@ -135,7 +138,7 @@ public class TrickDetector {
             flipAngle = 0;
         }
         var failed = Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
-        
+        failed |= this.curTrick.grab != null; // didn't let go of grab
         
         var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
         var trickList = new TrickList(failed, validTricks.toArray(new Trick[0]));
