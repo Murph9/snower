@@ -143,6 +143,8 @@ public class Player extends AbstractAppState implements ActionListener {
             var debug = m.getStateManager().getState(DebugAppState.class);
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
+
+            updateAnimation(snower.isCrashing() ? AnimState.Crashing : AnimState.Nothing);
         } else {
             trail.viewUpdate(tpf, null);
         }
@@ -151,13 +153,38 @@ public class Player extends AbstractAppState implements ActionListener {
     }
 
     public void grabbed(Grab action) {
-        var geom = (Geometry)playerNode.getChild(0);
-        var mat = geom.getMaterial();
 
         var grabName = action == null ? null : action.name;
         this.snower.grab(grabName);
 
-        // TODO hack to see grabs work without animations
-        mat.setColor("Color", action != null ? ColorRGBA.White : BASE_COLOUR);
+        updateAnimation(action == null ? AnimState.Nothing : AnimState.Grabbing);
+    }
+
+    enum AnimState {
+        Nothing,
+        Crashing,
+        Grabbing,;
+    }
+    private AnimState curState;
+    private void updateAnimation(AnimState type) {
+        if (curState == type)
+            return;
+        curState = type;
+            
+        var geom = (Geometry)playerNode.getChild(0);
+        var mat = geom.getMaterial();
+        switch(type) {
+            case Crashing:
+                mat.setColor("Color", ColorRGBA.Pink);
+                break;
+            case Grabbing:
+                mat.setColor("Color", ColorRGBA.White);
+                break;
+            case Nothing:
+                mat.setColor("Color", BASE_COLOUR);
+                break;
+            default:
+                System.out.println("Unknown animation state");
+        }
     }
 }

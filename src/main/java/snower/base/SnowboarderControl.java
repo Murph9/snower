@@ -17,6 +17,8 @@ public class SnowboarderControl extends BetterCharacterControl {
     private static final float GRAV_FALLING = 20;
     private static final float GRAV_GROUND = 40;
 
+    private static final float CRASH_TIME = 2;
+
     private static final float ROT_SPEED = 2.5f;
     private static final float SPIN_SPEED = 4.5f;
     private static final float DUCK_MOD = 1.4f;
@@ -33,7 +35,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private float groundAngle;
     private boolean switchStance;
-    private boolean crashing;
+    private float crashing;
 
     private Queue<TrickList> trickBuffer = new LinkedList<>();
     private TrickDetector detector;
@@ -72,10 +74,8 @@ public class SnowboarderControl extends BetterCharacterControl {
                 airFlipAmount = 0;
                 
                 if (result.failed) {
-                    speed = 1; // TODO better with animations and failure and what not
+                    crashing = CRASH_TIME;
                 }
-
-                // TODO figure out switch stance when its 180*360x (this also applies to going too slow, so method pls)
             }
         } else {
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
@@ -92,6 +92,9 @@ public class SnowboarderControl extends BetterCharacterControl {
             detector.update(dtAirRot, dtAirFlip);
         }
         
+        if (crashing > 0)
+            crashing -= tpf;
+
         var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount+airRotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
  
@@ -156,6 +159,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         return new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
     }
 
+    public boolean isCrashing() {
+        return this.crashing >= 0;
+    }
+
     public Vector3f[] getBoardExtents() {
         final float BOARD_WIDTH = 0.15f;
         final float BOARD_LENGTH = 1.55f;
@@ -208,13 +215,13 @@ public class SnowboarderControl extends BetterCharacterControl {
         // TODO check method tobe 'actually' drag related once we like a speed
 
         // TODO this needs some better logic, see 'me' notes
-        if (speed < 3 * duckSpeed) {
-            speed = 3 * duckSpeed;
-        }
+        speed = Math.max(speed, 3 * duckSpeed);
         
         // TODO this is even more terrible
-        if (speed > 45 * duckSpeed) {
-            speed = 45 * duckSpeed;
+        speed = Math.min(speed, 45 * duckSpeed);
+
+        if (crashing > 0) {
+            speed = Math.min(speed, 5);
         }
 
         // TODO change switch stance when losing speed going up hill
