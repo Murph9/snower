@@ -160,7 +160,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public boolean isCrashing() {
-        return this.crashing >= 0;
+        return this.crashing > 0;
     }
 
     public Vector3f[] getBoardExtents() {
