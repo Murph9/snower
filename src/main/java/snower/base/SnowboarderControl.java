@@ -18,6 +18,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private static final float GRAV_GROUND = 40;
 
     private static final float CRASH_TIME = 2;
+    private static final float SLOW_SPEED = 4;
 
     private static final float ROT_SPEED = 2.5f;
     private static final float SPIN_SPEED = 4.5f;
@@ -226,8 +227,13 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     
     private void applyDrag(float tpf) {
-        if (isOnGround()) //TODO fix slow, it should overwrite speed anything
-            speed -= slow*tpf;
+        if (isOnGround() && slow > 0) {
+            speed -= SLOW_SPEED*slow*tpf;
+            if (speed < 0) {
+                speed = 0.5f; // you can't stop completely, fixes annoying flipping direction issues
+            }
+            return;
+        }
         
         float duckSpeed = this.isDucked() ? DUCK_MOD : 1;
 
