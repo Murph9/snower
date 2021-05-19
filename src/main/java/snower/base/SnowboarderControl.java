@@ -119,16 +119,24 @@ public class SnowboarderControl extends BetterCharacterControl {
         }
         ((Node)getSpatial()).getChild(0).setLocalRotation(rot); // TODO hack to get the physical char rotated to match slope
         
-
-        // calc acceleration
-        var grav = this.getGravity(null);
-        speed += tpf*-FastMath.sin(groundAngle)*grav.length(); //TODO changing gravity changes this too much
-        
         // calc drag
         applyDrag(tpf);
 
+        // calc acceleration
+        speed += tpf * accelFromSlope();
+
         // apply speed
         if (this.isOnGround()) {
+            // swap direction if trying to go up a slope
+            if (speed < 0) {
+                speed = -speed;
+                this.switchStance = !this.switchStance;
+                this.rotAmount += FastMath.PI;
+
+                dir = Quaternion.IDENTITY.fromAngles(0, rotAmount+airRotAmount, 0).mult(Vector3f.UNIT_X);
+                setViewDirection(dir);
+            }
+
             this.setWalkDirection(dir.mult(speed));
         }
         // else this will just keep the speed from the last call
@@ -186,6 +194,11 @@ public class SnowboarderControl extends BetterCharacterControl {
         return extents;
     }
 
+    private float accelFromSlope() {
+        var grav = this.getGravity(null);
+        return -FastMath.sin(groundAngle)*grav.length(); // TODO changing gravity changes this too much
+    }
+
     private float calcCharAngle() {
         var dir = getSpatial().getWorldTransform().getRotation().mult(Vector3f.UNIT_Z).normalizeLocal();
 
@@ -213,24 +226,23 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     
     private void applyDrag(float tpf) {
-        if (isOnGround())
+        if (isOnGround()) //TODO fix slow, it should overwrite speed anything
             speed -= slow*tpf;
         
         float duckSpeed = this.isDucked() ? DUCK_MOD : 1;
 
-        // TODO check method tobe 'actually' drag related once we like a speed
-
-        // TODO this needs some better logic, see 'me' notes
-        speed = Math.max(speed, 3 * duckSpeed);
+        var grav = this.getGravity(null);
+        if (accelFromSlope() > -grav.length()/3) {
+            // if going down hill apply min
+            speed = Math.max(speed, 3 * duckSpeed);
+        }
         
-        // TODO this is even more terrible
+        // TODO do this with drag
         speed = Math.min(speed, 45 * duckSpeed);
 
         if (crashing > 0) {
             speed = Math.min(speed, 5);
         }
-
-        // TODO change switch stance when losing speed going up hill
     }
 
     public String getDebugStr() {
