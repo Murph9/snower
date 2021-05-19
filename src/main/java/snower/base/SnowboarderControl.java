@@ -52,6 +52,12 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     @Override
+    public void jump() {
+        if (!isCrashing())
+            super.jump();
+    }
+
+    @Override
     public void update(float tpf) {
         if (isOnGround()) {
             // stick character to the ground to prevent annoying jumping
