@@ -14,7 +14,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.EdgeFilteringMode;
 import com.simsilica.lemur.GuiGlobals;
-import com.simsilica.lemur.event.MouseAppState;
+
 
 
 public class Main extends SimpleApplication {

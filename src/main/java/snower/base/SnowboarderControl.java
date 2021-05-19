@@ -226,4 +226,11 @@ public class SnowboarderControl extends BetterCharacterControl {
 
         // TODO change switch stance when losing speed going up hill
     }
+
+    public String getDebugStr() {
+        var sb = new StringBuilder();
+        sb.append("Speed: " + getVelocity().length() + "\n");
+        sb.append("Ground char Speed: " + this.speed + "\n");
+        return sb.toString();
+    }
 }
