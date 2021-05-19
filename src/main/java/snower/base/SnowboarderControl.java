@@ -181,24 +181,24 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     private float calcCharAngle() {
-        var pos = getSpatial().getLocalTranslation();
         var dir = getSpatial().getWorldTransform().getRotation().mult(Vector3f.UNIT_Z).normalizeLocal();
 
-        // 'predict' the location of the ground
-        // TODO this could just happen all the time, just ignore weird large angles (like board height differences of more than 10m)
-        if (!isOnGround()) {
-            var findPos = Helper.findFirstPosDown(pos, 500, this.getRigidBody());
-            if (findPos != null)
-                pos = findPos;
-        }
+        // 'predict' the location of the ground (by doing my own ray cast)
+        var pos = getSpatial().getWorldTranslation();
+        var findPos = Helper.findFirstPosDown(pos.add(0, 1, 0), 500, this.getRigidBody());
+        if (findPos != null)
+            pos = findPos;
 
         // calc angle of char
         var frontPos = pos.add(dir).add(0, 1, 0);
         var rearPos = pos.subtract(dir).add(0, 1, 0);
         float frontHeight = Helper.findHeight(frontPos, 2, this.getRigidBody());
         float rearHeight = Helper.findHeight(rearPos, 2, this.getRigidBody());
+
         if (frontHeight != -1 && rearHeight != -1) {
             float diffheight = rearHeight - frontHeight;
+            if (Math.abs(diffheight) > 4) //ignore weird large angles (like board height differences of more than 4m)
+                return Float.NaN;
             return FastMath.atan2(diffheight, 2);
         }
 
