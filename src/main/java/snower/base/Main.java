@@ -1,6 +1,10 @@
 package snower.base;
 
+import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
+import com.jme3.app.state.ConstantVerifierState;
+import com.jme3.audio.AudioListenerState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.light.AmbientLight;
@@ -24,6 +28,15 @@ public class Main extends SimpleApplication {
     public static PhysicsSpace physicsSpace;
     private GameState gameState;
 
+    public Main() {
+        super(new StatsAppState(),
+            new AudioListenerState(),
+            new DebugKeysAppState(),
+            new ConstantVerifierState(),
+            new DebugAppState()
+        );
+    }
+
     @Override
     public void simpleInitApp() {
         BulletAppState bullet = new BulletAppState();
@@ -35,20 +48,15 @@ public class Main extends SimpleApplication {
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_CAMERA_POS); //doesn't work
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_MEMORY);
         inputManager.deleteMapping(SimpleApplication.INPUT_MAPPING_EXIT);
+        inputManager.deleteMapping(INPUT_MAPPING_EXIT); // no esc close pls
         
         //initialize Lemur (GUI thing)
         GuiGlobals.initialize(this);
         //Load my style
         LemurGuiStyle.load(assetManager);
-        //Init the lemur mouse listener
-        getStateManager().attach(new MouseAppState(this));
 
-        //some camera state stuff
-        flyCam.setEnabled(false);
-        getViewPort().setBackgroundColor(ColorRGBA.Black);
-
-        // TODO static class stuff
-        getStateManager().attach(new DebugAppState());
+        // maybe this should be done by the sky state?
+        getViewPort().setBackgroundColor(new ColorRGBA(0.6f, 0.6f, 1f, 1f));
 
         initLighting();
 
