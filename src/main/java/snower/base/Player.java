@@ -38,7 +38,7 @@ public class Player extends AbstractAppState implements ActionListener {
         this.trail = new SnowTrail(m);
     }
 
-    public SnowboarderControl getChar() {
+    public SnowboarderControl getControl() {
         return snower;
     }
 

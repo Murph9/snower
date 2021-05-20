@@ -28,7 +28,7 @@ public class GameState extends AbstractAppState {
         PullCam camera = new PullCam(cam, player.getCharNode());
         stateManager.attach(camera);
 
-        BoardingUI ui = new BoardingUI(player.getChar());
+        BoardingUI ui = new BoardingUI(player.getControl());
         stateManager.attach(ui);
         
         super.stateAttached(stateManager);
