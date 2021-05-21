@@ -43,6 +43,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
         setGravity(new Vector3f(0, -GRAV_GROUND, 0));
         setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
+        setPhysicsDamping(0.2f);
     }
 
     public TrickList getTrick() {
