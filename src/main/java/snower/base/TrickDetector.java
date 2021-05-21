@@ -2,7 +2,6 @@ package snower.base;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.jme3.math.FastMath;
 
@@ -15,13 +14,12 @@ public class TrickDetector {
     class TrickList {
         private Trick[] tricks;
         public final boolean failed;
+        public final boolean completed;
 
-        public TrickList(Trick ...tricks) {
-            this(false, tricks);
-        }
-        public TrickList(boolean failed, Trick ...tricks) {
+        public TrickList(boolean failed, boolean completed, Trick ...tricks) {
             this.tricks = tricks;
             this.failed = failed;
+            this.completed = completed;
         }
 
         public boolean hasTricks() {
@@ -63,6 +61,10 @@ public class TrickDetector {
         public int frontFlips;
         public int backFlips;
         public String grab;
+
+        public boolean anyValidTrick() {
+            return backFlips != 0 || frontFlips != 0 || grab != null || spins != 0;
+        }
 
         @Override
         public String toString() {
@@ -134,6 +136,11 @@ public class TrickDetector {
         }
     }
 
+    public TrickList progress() {
+        var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
+        return new TrickList(false, false, validTricks);
+    }
+
     public TrickList stop() {
         // some leniency, and set to 0 to show we landed correctly (on the last trick only)
         final float FRACTION = 0.2f; // within 10 percent
@@ -152,8 +159,8 @@ public class TrickDetector {
         }
         var failed = inTrick || Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
         
-        var validTricks = tricks.stream().filter(x -> x.backFlips != 0 || x.frontFlips != 0 || x.grab != null || x.spins != 0).collect(Collectors.toList());
-        var trickList = new TrickList(failed, validTricks.toArray(new Trick[0]));
+        var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
+        var trickList = new TrickList(failed, true, validTricks);
         return trickList;
     }
 }

@@ -6,6 +6,7 @@ import com.jme3.app.state.BaseAppState;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.Label;
 
+import snower.base.TrickDetector.TrickList;
 import snower.service.Screen;
 
 public class BoardingUI extends BaseAppState {
@@ -19,6 +20,7 @@ public class BoardingUI extends BaseAppState {
     private Container debugView;
     private Label debugText;
 
+    private TrickList prevTrick;
     private float trickTextTimer;
 
     public BoardingUI(SnowboarderControl control) {
@@ -38,16 +40,21 @@ public class BoardingUI extends BaseAppState {
 
     @Override
     public void update(float tpf) {
-        trickTextTimer -= tpf;
-        if (trickTextTimer < 0) {
-            this.trickText.setText("");
-
-            // buffer calling the tricks to display them
-            var trick = control.getTrick();
-            if (trick != null) {
+        // get trick, if not completed show it
+        var trick = control.getTrick();
+        if (trick != null) {
+            this.trickText.setText(trick.toString());
+            if (trick.completed) {
                 this.trickText.setText(trick.toString());
-                this.trickTextTimer = TRICK_MESSAGE_TIMEOUT;
+                if (prevTrick != trick)
+                    trickTextTimer = TRICK_MESSAGE_TIMEOUT;
+
+                trickTextTimer -= tpf;
+                if (trickTextTimer < 0) {
+                    this.trickText.setText("");
+                }
             }
+            prevTrick = trick;
         }
 
         Screen screen = new Screen(getApplication().getContext().getSettings());

@@ -1,8 +1,5 @@
 package snower.base;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -38,7 +35,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private boolean switchStance;
     private float crashing;
 
-    private Queue<TrickList> trickBuffer = new LinkedList<>();
+    private TrickList curTrick; // stores the current trick, or the last trick
     private TrickDetector detector;
     
     public SnowboarderControl() {
@@ -49,7 +46,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public TrickList getTrick() {
-        return this.trickBuffer.poll();
+        return curTrick;
     }
 
     @Override
@@ -70,7 +67,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             if (detector != null) {
                 var result = detector.stop();
                 if (result != null && result.hasTricks()) {
-                    this.trickBuffer.add(result);
+                    this.curTrick = result;
                     if (!result.stillFacingTheSameWay())
                         switchStance = !switchStance;
                 }
@@ -97,6 +94,11 @@ public class SnowboarderControl extends BetterCharacterControl {
             }
 
             detector.update(dtAirRot, dtAirFlip);
+
+            var result = detector.progress();
+            if (result != null & result.hasTricks()) {
+                curTrick = result;
+            }
         }
         
         if (crashing > 0)
@@ -149,7 +151,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         this.speed = 0;
         this.rotAmount = 0;
         this.airFlipAmount = 0;
-        this.trickBuffer.clear();
+        this.curTrick = null;
     }
 
     public void turn(float amount) {
@@ -161,7 +163,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public void grab(String name) {
-        if (name == null && detector == null)
+        if (detector == null)
             return;
         this.detector.grab(name);
     }
