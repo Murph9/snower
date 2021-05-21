@@ -10,6 +10,8 @@ import snower.base.TrickDetector.TrickList;
 
 public class SnowboarderControl extends BetterCharacterControl {
 
+    // TODO write my own BetterCharacterControl :( sadly its getting in the way of custom stuff
+
     private static final float MASS = 75;
     private static final float GRAV_FALLING = 20;
     private static final float GRAV_GROUND = 40;
