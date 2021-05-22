@@ -151,7 +151,7 @@ public class Player extends AbstractAppState implements ActionListener {
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
 
-            updateAnimation(snower.isCrashing() ? PlayerState.Crashing : PlayerState.Nothing);
+            updateAnimation(snower.isCrashing() ? PlayerState.Crashing : PlayerState.Nothing, null);
         } else {
             trail.viewUpdate(tpf, null);
         }
@@ -172,7 +172,7 @@ public class Player extends AbstractAppState implements ActionListener {
         var grabName = action == null ? null : action.name;
         this.snower.grab(grabName);
 
-        updateAnimation(action == null ? PlayerState.Nothing : PlayerState.Grabbing);
+        updateAnimation(action == null ? PlayerState.Nothing : PlayerState.Grabbing, grabName);
     }
 
     enum PlayerState {
@@ -181,7 +181,7 @@ public class Player extends AbstractAppState implements ActionListener {
         Grabbing,;
     }
     private PlayerState curState;
-    private void updateAnimation(PlayerState type) {
+    private void updateAnimation(PlayerState type, String details) {
         if (curState == type)
             return;
         curState = type;
@@ -189,10 +189,20 @@ public class Player extends AbstractAppState implements ActionListener {
         var anim = playerNode.getChild(0).getControl(AnimComposer.class);
         switch(type) {
             case Crashing:
-                anim.setCurrentAction("extra?");
+                anim.setCurrentAction("0TPose");
                 break;
             case Grabbing:
-                anim.setCurrentAction("0TPose");
+                switch(details) {
+                    case "DownGrab":
+                        anim.setCurrentAction("tail_grab");
+                        break;
+                    case "UpGrab":
+                        anim.setCurrentAction("nose_grab");
+                        break;
+                    default:
+                        System.out.println("Unknown grab type: " + details);
+                }
+                
                 break;
             case Nothing:
                 anim.setCurrentAction("boarding_normal");
@@ -202,3 +212,4 @@ public class Player extends AbstractAppState implements ActionListener {
         }
     }
 }
+//tail_grab,temp4,nose_grab,0TPose,boarding_normal,boarding_switch
