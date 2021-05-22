@@ -11,6 +11,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.plugins.gltf.GltfLoader;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.shadow.EdgeFilteringMode;
 import com.simsilica.lemur.GuiGlobals;
@@ -54,6 +55,9 @@ public class Main extends SimpleApplication {
         GuiGlobals.initialize(this);
         //Load my style
         LemurGuiStyle.load(assetManager);
+
+        // register glb loader
+        this.assetManager.registerLoader(GltfLoader.class, "glb", "gltf");
 
         // maybe this should be done by the sky state?
         getViewPort().setBackgroundColor(new ColorRGBA(0.6f, 0.6f, 1f, 1f));

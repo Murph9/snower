@@ -2,16 +2,18 @@ package snower.base;
 
 import java.util.LinkedList;
 
+import com.jme3.anim.AnimComposer;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -19,8 +21,6 @@ import snower.service.Grab;
 import snower.service.GrabListener;
 
 public class Player extends AbstractAppState implements ActionListener {
-
-    private static final ColorRGBA BASE_COLOUR = ColorRGBA.Blue;
 
     private final Main m;
     private final SnowboarderControl snower;
@@ -48,12 +48,17 @@ public class Player extends AbstractAppState implements ActionListener {
 
     @Override
     public void stateAttached(AppStateManager stateManager) {
-        // add player
-        Spatial playerG = m.getAssetManager().loadModel("models/stick_snowboarder.obj");
-        Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        baseMat.setColor("Color", BASE_COLOUR);
-        playerG.setMaterial(baseMat);
-        playerNode.attachChild(playerG);
+        
+        // add player model
+        Spatial newPlayer = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf")).getChild(0);
+        AnimComposer anim = newPlayer.getControl(AnimComposer.class);
+        
+        anim.addAction("boarding_normal", anim.makeAction("boarding_normal"));
+        anim.addAction("0TPose", anim.makeAction("0TPose"));
+
+        playerNode.attachChild(newPlayer);
+        newPlayer.breadthFirstTraversal(x -> x.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y)));
+
         resetPos();
         
         playerNode.addControl(snower);
@@ -144,7 +149,7 @@ public class Player extends AbstractAppState implements ActionListener {
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
 
-            updateAnimation(snower.isCrashing() ? AnimState.Crashing : AnimState.Nothing);
+            updateAnimation(snower.isCrashing() ? PlayerState.Crashing : PlayerState.Nothing);
         } else {
             trail.viewUpdate(tpf, null);
         }
@@ -157,31 +162,32 @@ public class Player extends AbstractAppState implements ActionListener {
         var grabName = action == null ? null : action.name;
         this.snower.grab(grabName);
 
-        updateAnimation(action == null ? AnimState.Nothing : AnimState.Grabbing);
+        updateAnimation(action == null ? PlayerState.Nothing : PlayerState.Grabbing);
     }
 
-    enum AnimState {
+    enum PlayerState {
         Nothing,
         Crashing,
         Grabbing,;
     }
-    private AnimState curState;
-    private void updateAnimation(AnimState type) {
+    private PlayerState curState;
+    private void updateAnimation(PlayerState type) {
         if (curState == type)
             return;
         curState = type;
-            
-        var geom = (Geometry)playerNode.getChild(0);
-        var mat = geom.getMaterial();
+        
+        var anim = playerNode.getChild(0).getControl(AnimComposer.class);
+        
+        
         switch(type) {
             case Crashing:
-                mat.setColor("Color", ColorRGBA.Pink);
+                anim.setCurrentAction("0TPose");
                 break;
             case Grabbing:
-                mat.setColor("Color", ColorRGBA.White);
+                anim.setCurrentAction("0TPose");
                 break;
             case Nothing:
-                mat.setColor("Color", BASE_COLOUR);
+                anim.setCurrentAction("boarding_normal");
                 break;
             default:
                 System.out.println("Unknown animation state");

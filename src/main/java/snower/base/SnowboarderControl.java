@@ -69,7 +69,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             
             if (detector != null) {
                 var result = detector.stop();
-                if (result != null && result.hasTricks()) {
+                if (result.hasTricks()) {
                     this.curTrick = result;
                     if (!result.stillFacingTheSameWay())
                         switchStance = !switchStance;
