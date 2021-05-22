@@ -53,8 +53,10 @@ public class Player extends AbstractAppState implements ActionListener {
         Spatial newPlayer = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf")).getChild(0);
         AnimComposer anim = newPlayer.getControl(AnimComposer.class);
         
-        anim.addAction("boarding_normal", anim.makeAction("boarding_normal"));
-        anim.addAction("0TPose", anim.makeAction("0TPose"));
+        for (var actionName : anim.getAnimClipsNames()) {
+            anim.addAction(actionName, anim.makeAction(actionName));
+        }
+        System.out.println("Player has these animations: " + String.join(",", anim.getAnimClipsNames()));
 
         playerNode.attachChild(newPlayer);
         newPlayer.breadthFirstTraversal(x -> x.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y)));
@@ -154,6 +156,14 @@ public class Player extends AbstractAppState implements ActionListener {
             trail.viewUpdate(tpf, null);
         }
 
+        if (curState == PlayerState.Nothing) {
+            var anim = playerNode.getChild(0).getControl(AnimComposer.class);
+            if (this.snower.isSwitch())
+                anim.setCurrentAction("boarding_switch");
+            else
+                anim.setCurrentAction("boarding_normal");
+        }
+
         super.update(tpf);
     }
 
@@ -177,11 +187,9 @@ public class Player extends AbstractAppState implements ActionListener {
         curState = type;
         
         var anim = playerNode.getChild(0).getControl(AnimComposer.class);
-        
-        
         switch(type) {
             case Crashing:
-                anim.setCurrentAction("0TPose");
+                anim.setCurrentAction("extra?");
                 break;
             case Grabbing:
                 anim.setCurrentAction("0TPose");

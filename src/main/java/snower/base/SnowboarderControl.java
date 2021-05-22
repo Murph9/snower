@@ -52,6 +52,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         return curTrick;
     }
 
+    public boolean isSwitch() {
+        return this.switchStance;
+    }
+
     @Override
     public void jump() {
         if (!isCrashing())
