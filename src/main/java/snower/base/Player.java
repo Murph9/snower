@@ -54,9 +54,11 @@ public class Player extends AbstractAppState implements ActionListener {
         AnimComposer anim = newPlayer.getControl(AnimComposer.class);
         
         for (var actionName : anim.getAnimClipsNames()) {
-            anim.addAction(actionName, anim.makeAction(actionName));
+            var a = anim.makeAction(actionName);
+            a.setLength(0.6f); // allow smooth animation transitions
+            anim.addAction(actionName, a);
         }
-        System.out.println("Player has these animations: " + String.join(",", anim.getAnimClipsNames()));
+        System.out.println("Player has these animations: " + String.join(", ", anim.getAnimClipsNames()));
 
         playerNode.attachChild(newPlayer);
         newPlayer.breadthFirstTraversal(x -> x.setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y)));
@@ -186,18 +188,21 @@ public class Player extends AbstractAppState implements ActionListener {
             return;
         curState = type;
         
+        System.out.println("Updating animation with: " + type + " " + details);
+        
         var anim = playerNode.getChild(0).getControl(AnimComposer.class);
+        String newAction = null;
         switch(type) {
             case Crashing:
-                anim.setCurrentAction("0TPose");
+                newAction = "0TPose";
                 break;
             case Grabbing:
                 switch(details) {
                     case "DownGrab":
-                        anim.setCurrentAction("tail_grab");
+                        newAction = "tail_grab";
                         break;
                     case "UpGrab":
-                        anim.setCurrentAction("nose_grab");
+                        newAction = "nose_grab";
                         break;
                     default:
                         System.out.println("Unknown grab type: " + details);
@@ -205,11 +210,12 @@ public class Player extends AbstractAppState implements ActionListener {
                 
                 break;
             case Nothing:
-                anim.setCurrentAction("boarding_normal");
+                newAction = "boarding_normal";
                 break;
             default:
                 System.out.println("Unknown animation state");
         }
+
+        anim.setCurrentAction(newAction);
     }
 }
-//tail_grab,temp4,nose_grab,0TPose,boarding_normal,boarding_switch
