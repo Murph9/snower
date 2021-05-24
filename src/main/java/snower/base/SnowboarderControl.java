@@ -75,8 +75,10 @@ public class SnowboarderControl extends BetterCharacterControl {
                 var result = detector.stop();
                 if (result.hasTricks()) {
                     this.curTrick = result;
-                    if (!result.stillFacingTheSameWay())
+                    if (!result.stillFacingTheSameWay()) {
                         switchStance = !switchStance;
+                        groundAngle = -groundAngle;
+                    }
                 }
                 detector = null;
 
