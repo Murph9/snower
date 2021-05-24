@@ -12,6 +12,8 @@ import snower.base.TrickDetector.TrickList;
 public class SnowboarderControl extends BetterCharacterControl {
 
     // TODO write my own BetterCharacterControl :( sadly its getting in the way of custom stuff
+    
+    // TODO any getChild(0) reference is a hack
 
     private static final float MASS = 75;
     private static final float GRAV_FALLING = 20;
@@ -148,7 +150,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         } else {
             rot = new Quaternion().fromAngles(airFlipAmount - groundAngle, 0, 0);
         }
-        ((Node)getSpatial()).getChild(0).setLocalRotation(rot); // TODO hack to get the physical char rotated to match slope
+        ((Node)getSpatial()).getChild(0).setLocalRotation(rot);
         
         // calc drag
         applyDrag(tpf);
@@ -221,7 +223,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         var dir = this.getViewDirection().normalize();
         dir.multLocal(BOARD_LENGTH/2);
         var pos = this.getSpatialTranslation();
-        var worldRot = ((Node)this.getSpatial()).getChild(0).getWorldRotation(); //TODO any getChild(0) reference is a hack
+        var worldRot = ((Node)this.getSpatial()).getChild(0).getWorldRotation();
         var extents = new Vector3f[] {
             worldRot.mult(Vector3f.UNIT_Z.clone().addLocal(BOARD_WIDTH, 0, 0)).addLocal(pos),
             worldRot.mult(Vector3f.UNIT_Z.clone().addLocal(-BOARD_WIDTH, 0, 0)).addLocal(pos),
