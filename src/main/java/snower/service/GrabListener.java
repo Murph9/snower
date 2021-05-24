@@ -7,18 +7,18 @@ import com.jme3.input.InputManager;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 
-import snower.base.Player;
+import snower.base.PlayerInputs;
 
 public class GrabListener implements ActionListener {
     
     private static final String BASE_ACTION = "BaseAction";
 
-    private final Player player; //TODO this shouldn't be a dependency
+    private final PlayerInputs player;
 
     private final HashMap<String, Grab> grabKeys;
     private boolean baseKeyPressed;
 
-    public GrabListener(Player player, InputManager im, int baseKey, Grab ...grabs) {
+    public GrabListener(PlayerInputs player, InputManager im, int baseKey, Grab ...grabs) {
         this.player = player;
         
         im.addMapping(BASE_ACTION, new KeyTrigger(baseKey));

@@ -65,6 +65,7 @@ public class WorldState extends AbstractAppState {
     public void stateDetached(AppStateManager stateManager) {
         super.stateDetached(stateManager);
         
-        Main.physicsSpace.remove(levels);
+        for (Geometry l: levels)
+            Main.physicsSpace.remove(l);
     }
 }

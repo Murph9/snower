@@ -1,6 +1,6 @@
 package snower.base;
 
-import com.jme3.app.Application;
+import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
@@ -57,7 +57,7 @@ public class SnowTrail {
     private Vector3f lastL;
     private Vector3f lastR;
 
-    public SnowTrail(Application app) {
+    public SnowTrail(AssetManager am) {
 
         vertices = new Vector3f[VERTEX_BUFFER_SIZE];
 
@@ -73,7 +73,7 @@ public class SnowTrail {
         this.trailLine.setMesh(mesh);
         
         // set material
-        Material mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Material mat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.getAdditionalRenderState().setFaceCullMode(FaceCullMode.Off);
         mat.setColor("Color", BASE_TRAIL_COLOUR);
 

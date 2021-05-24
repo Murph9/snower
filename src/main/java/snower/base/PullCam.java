@@ -6,16 +6,16 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
-import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 public class PullCam extends BaseAppState {
 
     private final Camera c;
-    private final Node playerNode;
+    private final Spatial playerNode;
 
     private Vector3f lastPos;
 
-    public PullCam(Camera c, Node playerNode) {
+    public PullCam(Camera c, Spatial playerNode) {
         this.c = c;
         this.playerNode = playerNode;
     }

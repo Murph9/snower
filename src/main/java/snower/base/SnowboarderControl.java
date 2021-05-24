@@ -5,6 +5,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 import snower.base.TrickDetector.TrickList;
 
@@ -23,6 +24,8 @@ public class SnowboarderControl extends BetterCharacterControl {
     private static final float SPIN_SPEED = 4.5f;
     private static final float DUCK_MOD = 1.4f;
     
+    private final WorldState w;
+
     private float tempRotAmount;
     private float rotAmount;
 
@@ -40,12 +43,24 @@ public class SnowboarderControl extends BetterCharacterControl {
     private TrickList curTrick; // stores the current trick, or the last trick
     private TrickDetector detector;
     
-    public SnowboarderControl() {
+    public SnowboarderControl(WorldState w) {
         super(0.5f, 1.8f, MASS);
+
+        this.w = w;
 
         setGravity(new Vector3f(0, -GRAV_GROUND, 0));
         setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
         setPhysicsDamping(0.2f);
+    }
+
+    @Override
+    public void setSpatial(Spatial newSpatial) {
+        super.setSpatial(newSpatial);
+        resetPos();
+    }
+    
+    public void resetPos() {
+        warp(w.startPos());
     }
 
     public TrickList getTrick() {
@@ -178,7 +193,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         this.detector.grab(name);
     }
 
-    public void stop(float amount) {
+    public void slow(float amount) {
         slow = amount;
     }
 
@@ -191,6 +206,12 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
     public boolean isSlowing() {
         return this.slow > 0.2f;
+    }
+    public boolean isGrabbing() {
+        return this.detector.inGrab();
+    }
+    public String getGrab() {
+        return this.detector.curGrab();
     }
 
     public Vector3f[] getBoardExtents() {

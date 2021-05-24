@@ -95,6 +95,13 @@ public class TrickDetector {
         tricks.add(curTrick);
     }
 
+    public boolean inGrab() {
+        return inTrick;
+    }
+    public String curGrab() {
+        return curTrick.grab;
+    }
+
     public void update(float dRotAngle, float dFlipAngle) {
         rotAngle += dRotAngle;
         flipAngle += dFlipAngle;
