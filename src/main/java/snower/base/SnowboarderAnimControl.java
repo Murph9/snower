@@ -16,6 +16,10 @@ public class SnowboarderAnimControl extends AbstractControl {
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
 
+        if (spatial == null) {
+            return;
+        }
+
         var anim = spatial.getControl(AnimComposer.class);
         for (var actionName : anim.getAnimClipsNames()) {
             var a = anim.makeAction(actionName);
