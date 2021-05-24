@@ -28,7 +28,7 @@ public class TrickDetector {
         public Trick[] getTricks() {
             return tricks;
         }
-        public boolean stillFacingTheSameWay() {
+        public boolean landedSwitch() {
             int spins = 0;
             for (Trick t: this.tricks) {
                 spins += t.spins;

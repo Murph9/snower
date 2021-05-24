@@ -62,6 +62,11 @@ public class SnowboarderControl extends BetterCharacterControl {
             super.jump();
     }
 
+    private void toggleSwitch() {
+        this.switchStance = !this.switchStance;
+        this.groundAngle = -this.groundAngle;
+    }
+
     @Override
     public void update(float tpf) {
         if (isOnGround()) {
@@ -75,9 +80,8 @@ public class SnowboarderControl extends BetterCharacterControl {
                 var result = detector.stop();
                 if (result.hasTricks()) {
                     this.curTrick = result;
-                    if (!result.stillFacingTheSameWay()) {
-                        switchStance = !switchStance;
-                        groundAngle = -groundAngle;
+                    if (!result.landedSwitch()) {
+                        toggleSwitch();
                     }
                 }
                 detector = null;
@@ -94,7 +98,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
             var dtAirRot = tempRotAmount*tpf*SPIN_SPEED;
-            var dtAirFlip = tempAirFlipAmount*tpf*SPIN_SPEED/2;
+            var dtAirFlip = tempAirFlipAmount*tpf*SPIN_SPEED;
             airRotAmount += dtAirRot;
             airFlipAmount += dtAirFlip;
             
@@ -141,12 +145,9 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (this.isOnGround()) {
             // swap direction if trying to go up a slope
             if (speed < 0) {
-                speed = -speed;
-                this.switchStance = !this.switchStance;
+                speed = 0;
                 this.rotAmount += FastMath.PI;
-
-                dir = Quaternion.IDENTITY.fromAngles(0, rotAmount+airRotAmount, 0).mult(Vector3f.UNIT_X);
-                setViewDirection(dir);
+                toggleSwitch();
             }
 
             this.setWalkDirection(dir.mult(speed));
@@ -241,24 +242,17 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (isOnGround() && slow > 0) {
             speed -= SLOW_SPEED*slow*tpf;
             if (speed < 0) {
-                speed = 0.5f; // you can't stop completely, fixes annoying flipping direction issues
+                speed = 0.25f; // you can't stop completely, fixes annoying flipping direction issues
             }
             return;
         }
-        
-        float duckSpeed = this.isDucked() ? DUCK_MOD : 1;
 
-        var grav = this.getGravity(null);
-        if (accelFromSlope() > -grav.length()/3) {
-            // if going down hill apply min
-            speed = Math.max(speed, 3 * duckSpeed);
-        }
-        
         // TODO do this with drag
-        speed = Math.min(speed, 45 * duckSpeed);
+        float maxSpeed = 45 * (this.isDucked() ? DUCK_MOD : 1);
+        speed = Math.min(speed, maxSpeed);
 
         if (crashing > 0) {
-            speed = Math.min(speed, 5);
+            speed = Math.min(speed, 5); // while crashing prevent going faster than 5
         }
     }
 
