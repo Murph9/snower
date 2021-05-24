@@ -27,10 +27,9 @@ public class GameState extends BaseAppState {
         app.getStateManager().attach(world);
 
         // add player model
-        var playerNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf")).getChild(0);
-        var controlNode = new Node("player control node");
+        var controlNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
+        var playerNode = ((Node)controlNode).getChild(0);
         snower = new SnowboarderControl(world);
-        controlNode.attachChild(playerNode);
         controlNode.addControl(snower);
         Main.physicsSpace.add(snower);
         this.m.getRootNode().attachChild(controlNode);
