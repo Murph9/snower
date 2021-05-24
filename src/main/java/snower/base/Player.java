@@ -153,7 +153,12 @@ public class Player extends AbstractAppState implements ActionListener {
             debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
             debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
 
-            updateAnimation(snower.isCrashing() ? PlayerState.Crashing : PlayerState.Nothing, null);
+            if (snower.isCrashing())
+                updateAnimation(PlayerState.Crashing, null);
+            else if (snower.isSlowing())
+                updateAnimation(PlayerState.Slowing, null);
+            else
+                updateAnimation(PlayerState.Nothing, null);
         } else {
             trail.viewUpdate(tpf, null);
         }
@@ -179,6 +184,9 @@ public class Player extends AbstractAppState implements ActionListener {
 
     enum PlayerState {
         Nothing,
+        TurningLeft,
+        TurningRight,
+        Slowing,
         Crashing,
         Grabbing,;
     }
@@ -197,25 +205,28 @@ public class Player extends AbstractAppState implements ActionListener {
                 newAction = "0TPose";
                 break;
             case Grabbing:
-                switch(details) {
-                    case "DownGrab":
-                        newAction = "tail_grab";
-                        break;
-                    case "UpGrab":
-                        newAction = "nose_grab";
-                        break;
-                    default:
-                        System.out.println("Unknown grab type: " + details);
-                }
-                
+                newAction = getGrabAction(details);
                 break;
             case Nothing:
                 newAction = "boarding_normal";
                 break;
             default:
-                System.out.println("Unknown animation state");
+                newAction = "0TPose";
+                System.out.println("Warning: unknown animation state: " + type);
         }
 
         anim.setCurrentAction(newAction);
+    }
+
+    private String getGrabAction(String name) {
+        switch(name) {
+            case "DownGrab":
+                return "tail_grab";
+            case "UpGrab":
+                return "nose_grab";
+            default:
+                System.out.println("Unknown grab type: " + name);
+                throw new IllegalArgumentException(name);
+        }
     }
 }

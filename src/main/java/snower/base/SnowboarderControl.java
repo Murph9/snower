@@ -189,6 +189,9 @@ public class SnowboarderControl extends BetterCharacterControl {
     public boolean isCrashing() {
         return this.crashing > 0;
     }
+    public boolean isSlowing() {
+        return this.slow > 0.2f;
+    }
 
     public Vector3f[] getBoardExtents() {
         final float BOARD_WIDTH = 0.15f;

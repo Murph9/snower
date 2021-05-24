@@ -39,7 +39,7 @@ public class TrickDetector {
         @Override
         public String toString() {
             if (tricks.length < 1) {
-                return "[" + (this.failed ? "Failed" : "") +"]";
+                return this.failed ? "[Failed]" : null;
             }
             
             StringBuilder sb = new StringBuilder();
