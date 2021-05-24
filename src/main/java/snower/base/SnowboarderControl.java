@@ -20,11 +20,13 @@ public class SnowboarderControl extends BetterCharacterControl {
     private static final float GRAV_GROUND = 40;
 
     private static final float CRASH_TIME = 2;
-    private static final float SLOW_SPEED = 4;
 
     private static final float ROT_SPEED = 2.5f;
-    private static final float SPIN_SPEED = 4.5f;
     private static final float DUCK_MOD = 1.4f;
+    private static final float SLOW_SPEED = 50;
+
+    private static final float SPIN_SPEED = 4.5f;
+    private static final float FLIP_SPEED = 3.5f;
     
     private final WorldState w;
 
@@ -115,7 +117,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
             var dtAirRot = tempRotAmount*tpf*SPIN_SPEED;
-            var dtAirFlip = tempAirFlipAmount*tpf*SPIN_SPEED;
+            var dtAirFlip = tempAirFlipAmount*tpf*FLIP_SPEED;
             airRotAmount += dtAirRot;
             airFlipAmount += dtAirFlip;
             
@@ -217,6 +219,8 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public Vector3f[] getBoardExtents() {
+        // TODO calc this in anim control with nodes on the actual character
+
         final float BOARD_WIDTH = 0.15f;
         final float BOARD_LENGTH = 1.55f;
 

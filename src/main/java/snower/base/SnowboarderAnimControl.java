@@ -62,7 +62,7 @@ public class SnowboarderAnimControl extends AbstractControl {
 
     enum PlayerState {
         Nothing,
-        NothingSwitch,
+        NothingSwitch, //TODO switch needs to be a char mirror for all moves
         Ducked,
         TurningLeft,
         TurningRight,
