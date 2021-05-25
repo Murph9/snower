@@ -66,6 +66,8 @@ public class GameState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
+        var debug = m.getStateManager().getState(DebugAppState.class);
+
         var extents = snower.getBoardExtents();
         if (snower.isOnGround()) {
             trail.viewUpdate(tpf, extents);
@@ -73,11 +75,13 @@ public class GameState extends BaseAppState {
             trail.viewUpdate(tpf, null);
         }
 
-        if (snower.isOnGround()) {
-            var points = Helper.getMinMaxX(extents);
-            var debug = m.getStateManager().getState(DebugAppState.class);
-            debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
-            debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
+        if (debug.DEBUG()) {
+            if (snower.isOnGround()) {
+                var points = Helper.getMinMaxX(extents);
+                debug.drawBox("a0", ColorRGBA.Orange, points[0], 0.1f);
+                debug.drawBox("a1", ColorRGBA.Orange, points[1], 0.1f);
+            }
+            debug.drawBox("player pos", ColorRGBA.Black, snower.getRigidBody().getPhysicsLocation(), 0.1f);
         }
     }
 
