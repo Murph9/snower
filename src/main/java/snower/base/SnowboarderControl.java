@@ -85,9 +85,14 @@ public class SnowboarderControl extends BetterCharacterControl {
             super.jump();
     }
 
-    private void toggleSwitch() {
+    /**Toggle riding switch, returns if success */
+    private boolean toggleSwitch() {
+        if (this.switchStanceTimeout < 0)
+            return false;
+        
         this.switchStance = !this.switchStance;
         this.switchStanceTimeout = 1;
+        return true;
     }
 
     @Override
@@ -177,9 +182,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (this.isOnGround()) {
             // swap direction if trying to go up a slope
             if (speed < 0) {
-                speed = 0;
-                this.rotAmount += FastMath.PI;
-                toggleSwitch();
+                if (toggleSwitch()) {
+                    speed = 0;
+                    this.rotAmount += FastMath.PI;
+                }
             }
 
             this.setWalkDirection(dir.mult(speed));

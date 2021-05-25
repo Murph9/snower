@@ -82,7 +82,7 @@ public class TrickDetector {
                 sb.append(backFlips + " backflip ");
             }
             if (grab != null) {
-                sb.append(grab);
+                sb.append(grab.getName());
             }
             return sb.toString().trim();
         }
