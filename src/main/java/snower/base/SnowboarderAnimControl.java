@@ -55,7 +55,6 @@ public class SnowboarderAnimControl extends AbstractControl {
 
     enum PlayerState {
         Nothing,
-        NothingSwitch, //TODO switch needs to be a char mirror for all moves
         Ducked,
         TurningLeft,
         TurningRight,
@@ -86,9 +85,6 @@ public class SnowboarderAnimControl extends AbstractControl {
             case Nothing:
                 newAction = "boarding_normal";
                 break;
-            case NothingSwitch:
-                newAction = "boarding_switch";
-                break;
             default:
                 newAction = "0TPose";
                 System.out.println("Warning: unknown animation state: " + type);
@@ -99,7 +95,7 @@ public class SnowboarderAnimControl extends AbstractControl {
 
     private String getGrabAction(String name) {
         switch(name) {
-            case "DownGrab":
+            case "DownGrab": // TODO CONST pls [i achknowledge that the poses have to be hardcoded]
                 return "tail_grab";
             case "UpGrab":
                 return "nose_grab";
