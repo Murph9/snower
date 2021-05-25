@@ -145,6 +145,16 @@ public class SnowboarderControl extends BetterCharacterControl {
             newGroundAngle = 0;
         groundAngle = FastMath.interpolateLinear(10*tpf, groundAngle, newGroundAngle);
         
+        // char center pos is at feet - prevent weird rotation by moving the center of the character dynamically while in air
+        if (airFlipAmount != 0) {
+            var height = this.getFinalHeight();
+            var diffheight = height * (-FastMath.cos(airFlipAmount) + 1) / 2;
+            var diffZ = height * -FastMath.sin(airFlipAmount) / 2;
+            ((Node)getSpatial()).getChild(0).setLocalTranslation(0, diffheight, diffZ);
+        } else {
+            ((Node)getSpatial()).getChild(0).setLocalTranslation(0, 0, 0);
+        }
+        
         // set angle of character Node based on the floor angle
         Quaternion rot;
         if (this.switchStance) {
