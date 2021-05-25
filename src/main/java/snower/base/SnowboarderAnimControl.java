@@ -79,7 +79,7 @@ public class SnowboarderAnimControl extends AbstractControl {
         String newAction = null;
         switch(type) {
             case Crashing:
-                newAction = "0TPose";
+                newAction = "crashing";
                 break;
             case Grabbing:
                 newAction = getGrabAction(grab);
