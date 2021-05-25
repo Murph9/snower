@@ -41,6 +41,8 @@ public class SnowboarderControl extends BetterCharacterControl {
     private float slow;
 
     private float groundAngle;
+
+    private float switchStanceTimeout;
     private boolean switchStance;
     private float crashing;
 
@@ -83,11 +85,14 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private void toggleSwitch() {
         this.switchStance = !this.switchStance;
-        this.groundAngle = -this.groundAngle;
+        this.switchStanceTimeout = 1;
     }
 
     @Override
     public void update(float tpf) {
+        if (switchStanceTimeout > 0)
+            switchStanceTimeout -= tpf;
+
         if (isOnGround()) {
             // stick character to the ground to prevent annoying jumping
             // also ignore the BetterCharacterControl gravity setting, its confusingly broken here
@@ -156,13 +161,9 @@ public class SnowboarderControl extends BetterCharacterControl {
         }
         
         // set angle of character Node based on the floor angle
-        Quaternion rot;
-        if (this.switchStance) {
-            rot = new Quaternion().fromAngles(- airFlipAmount + groundAngle, FastMath.PI, 0);
-        } else {
-            rot = new Quaternion().fromAngles(airFlipAmount - groundAngle, 0, 0);
-        }
+        var rot = new Quaternion().fromAngles(airFlipAmount - groundAngle, 0, 0);
         ((Node)getSpatial()).getChild(0).setLocalRotation(rot);
+        ((Node)getSpatial()).getChild(0).setLocalScale(1, 1, this.switchStance ? 1 : -1); // switch allows
         
         // calc drag
         applyDrag(tpf);

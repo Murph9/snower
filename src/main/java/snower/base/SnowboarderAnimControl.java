@@ -35,27 +35,16 @@ public class SnowboarderAnimControl extends AbstractControl {
     protected void controlUpdate(float tpf) {
         var snower = spatial.getParent().getControl(SnowboarderControl.class);
 
-        if (snower.isOnGround()) {
-            if (snower.isCrashing())
-                updateAnimation(PlayerState.Crashing);
-            else if (snower.isDucked())
-                updateAnimation(PlayerState.Ducked);
-            else if (snower.isSlowing())
-                updateAnimation(PlayerState.Slowing);
-            else {
-                if (snower.isSwitch())
-                    updateAnimation(PlayerState.NothingSwitch);
-                else
-                    updateAnimation(PlayerState.Nothing);
-            }
-        } else {
-            if (snower.isGrabbing()) {
-                var grab = snower.getGrab();
-                updateAnimation(PlayerState.Grabbing, grab);
-            } else {
-                updateAnimation(PlayerState.Nothing);
-            }
-        }
+        if (!snower.isOnGround() && snower.isGrabbing())
+            setPose(PlayerState.Grabbing, snower.getGrab());
+        else if (snower.isCrashing())
+            setPose(PlayerState.Crashing);
+        else if (snower.isDucked())
+            setPose(PlayerState.Ducked);
+        else if (snower.isSlowing())
+            setPose(PlayerState.Slowing);
+        else
+            setPose(PlayerState.Nothing);
     }
 
     @Override
@@ -75,10 +64,10 @@ public class SnowboarderAnimControl extends AbstractControl {
         Grabbing,;
     }
     private PlayerState curState;
-    private void updateAnimation(PlayerState type) {
-        updateAnimation(type, null);
+    private void setPose(PlayerState type) {
+        setPose(type, null);
     }
-    private void updateAnimation(PlayerState type, String details) {
+    private void setPose(PlayerState type, String details) {
         if (curState == type)
             return;
         curState = type;
