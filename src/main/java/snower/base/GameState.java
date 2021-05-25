@@ -4,6 +4,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Node;
 
 public class GameState extends BaseAppState {
@@ -29,6 +30,7 @@ public class GameState extends BaseAppState {
         // add player model
         var controlNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
         var playerNode = ((Node)controlNode).getChild(0);
+        playerNode.setShadowMode(ShadowMode.CastAndReceive);
         snower = new SnowboarderControl(world);
         controlNode.addControl(snower);
         Main.physicsSpace.add(snower);
@@ -46,7 +48,7 @@ public class GameState extends BaseAppState {
 
         // camera
         Camera cam = m.getCamera();
-        PullCam camera = new PullCam(cam, playerNode);
+        PullCam camera = new PullCam(cam, controlNode);
         app.getStateManager().attach(camera);
 
         BoardingUI ui = new BoardingUI(snower);

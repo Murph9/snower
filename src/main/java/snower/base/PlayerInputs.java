@@ -6,8 +6,6 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.Node;
 
 import snower.service.Grab;
 import snower.service.GrabListener;
@@ -16,16 +14,12 @@ public class PlayerInputs implements ActionListener {
 
     private final InputManager im;
     private final SnowboarderControl snower;
-    private final Node playerNode;
 
     private GrabListener grabListener;
 
     public PlayerInputs(InputManager im, SnowboarderControl snower) {
         this.im = im;
         this.snower = snower;
-
-        this.playerNode = new Node("character node");
-        this.playerNode.setShadowMode(ShadowMode.Cast);
 
         setupKeys();
     }
