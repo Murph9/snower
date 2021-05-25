@@ -87,7 +87,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     /**Toggle riding switch, returns if success */
     private boolean toggleSwitch() {
-        if (this.switchStanceTimeout < 0)
+        if (this.switchStanceTimeout > 0)
             return false;
         
         this.switchStance = !this.switchStance;
@@ -309,6 +309,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         var sb = new StringBuilder();
         sb.append("Speed: " + getVelocity().length() + "\n");
         sb.append("Ground char Speed: " + this.speed + "\n");
+        sb.append("Rot: " + this.rotAmount + "\n");
+        sb.append("Switch: " + this.switchStance + "\n");
+        sb.append("Air flip: " + this.airFlipAmount + "\n");
+        sb.append("Air rot: " + this.airRotAmount + "\n");
         return sb.toString();
     }
 }
