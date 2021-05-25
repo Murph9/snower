@@ -9,6 +9,7 @@ import com.jme3.input.controls.KeyTrigger;
 
 import snower.service.Grab;
 import snower.service.GrabListener;
+import snower.service.GrabMapper;
 
 public class PlayerInputs implements ActionListener {
 
@@ -75,8 +76,8 @@ public class PlayerInputs implements ActionListener {
         grabListener.deregister(im);
     }
 
-    public void grabbed(Grab action) {
-        var grabName = action == null ? null : action.name;
-        snower.grab(grabName);
+    public void grabbed(float ud, float lr) {
+        var grabDir = GrabMapper.getGrabFrom(ud, lr, snower.isSwitch());
+        snower.grab(grabDir);
     }
 }

@@ -11,6 +11,8 @@ import snower.base.PlayerInputs;
 
 public class GrabListener implements ActionListener {
     
+    // TODO this should work by pressing a direction and holding the baseaction button
+
     private static final String BASE_ACTION = "BaseAction";
 
     private final PlayerInputs player;
@@ -46,7 +48,7 @@ public class GrabListener implements ActionListener {
         if (name.equals(BASE_ACTION)) {
             baseKeyPressed = isPressed;
             if (!isPressed) {
-                this.player.grabbed(null);
+                this.player.grabbed(0, 0);
             }
         }
         
@@ -54,7 +56,7 @@ public class GrabListener implements ActionListener {
             for (Entry<String, Grab> grab: grabKeys.entrySet()) {
                 if (isPressed && name.equals(grab.getKey())) {
                     baseKeyPressed = false; // need to let go of the grab button to continue
-                    this.player.grabbed(grabKeys.get(name));
+                    this.player.grabbed(1, 0); //TODO fix
                     break;
                 }
             }

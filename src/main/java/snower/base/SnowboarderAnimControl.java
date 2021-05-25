@@ -10,6 +10,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
+import snower.service.GrabMapper.GrabEnum;
+
 public class SnowboarderAnimControl extends AbstractControl {
 
     @Override
@@ -66,12 +68,12 @@ public class SnowboarderAnimControl extends AbstractControl {
     private void setPose(PlayerState type) {
         setPose(type, null);
     }
-    private void setPose(PlayerState type, String details) {
+    private void setPose(PlayerState type, GrabEnum grab) {
         if (curState == type)
             return;
         curState = type;
         
-        System.out.println("Updating animation with: " + type + " " + details);
+        System.out.println("Updating animation with: " + type + " " + grab);
         
         var anim = spatial.getControl(AnimComposer.class);
         String newAction = null;
@@ -80,7 +82,7 @@ public class SnowboarderAnimControl extends AbstractControl {
                 newAction = "0TPose";
                 break;
             case Grabbing:
-                newAction = getGrabAction(details);
+                newAction = getGrabAction(grab);
                 break;
             case Nothing:
                 newAction = "boarding_normal";
@@ -93,15 +95,15 @@ public class SnowboarderAnimControl extends AbstractControl {
         anim.setCurrentAction(newAction);
     }
 
-    private String getGrabAction(String name) {
-        switch(name) {
-            case "DownGrab": // TODO CONST pls [i achknowledge that the poses have to be hardcoded]
+    private String getGrabAction(GrabEnum grab) {
+        switch(grab) {
+            case DOWN:
                 return "tail_grab";
-            case "UpGrab":
+            case UP:
                 return "nose_grab";
             default:
-                System.out.println("Unknown grab type: " + name);
-                throw new IllegalArgumentException(name);
+                System.out.println("Unknown grab type: " + grab.getName());
+                return "Unknown grab + " + grab.getName();
         }
     }
 }

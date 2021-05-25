@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.jme3.math.FastMath;
 
+import snower.service.GrabMapper;
+import snower.service.GrabMapper.GrabEnum;
+
 public class TrickDetector {
     // TODO should this be a spatial control?
     
@@ -60,7 +63,7 @@ public class TrickDetector {
         public int spins;
         public int frontFlips;
         public int backFlips;
-        public String grab;
+        public GrabEnum grab;
 
         public boolean anyValidTrick() {
             return backFlips != 0 || frontFlips != 0 || grab != null || spins != 0;
@@ -98,7 +101,7 @@ public class TrickDetector {
     public boolean inGrab() {
         return inTrick;
     }
-    public String curGrab() {
+    public GrabEnum curGrab() {
         return curTrick.grab;
     }
 
@@ -126,19 +129,17 @@ public class TrickDetector {
             flipAngle += FastMath.TWO_PI;
         }
     }
-    public void grab(String name) {
-        inTrick = name != null;
+    public void grab(GrabMapper.GrabEnum grab) {
+        inTrick = grab != null;
 
         if (curTrick.grab == null) {
-            curTrick.grab = name;
+            curTrick.grab = grab;
         } else {
-            if (curTrick.grab.equals(name))
-                return; //don't update the same grab
-            if (name == null)
+            if (grab == null)
                 return; //don't void the previous trick's grab with no grab
             
             curTrick = new Trick();
-            curTrick.grab = name;
+            curTrick.grab = grab;
             tricks.add(curTrick);
         }
     }

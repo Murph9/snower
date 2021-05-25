@@ -8,6 +8,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import snower.base.TrickDetector.TrickList;
+import snower.service.GrabMapper;
+import snower.service.GrabMapper.GrabEnum;
 
 public class SnowboarderControl extends BetterCharacterControl {
 
@@ -202,10 +204,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         tempAirFlipAmount = amount;
     }
 
-    public void grab(String name) {
+    public void grab(GrabMapper.GrabEnum grabDir) {
         if (detector == null)
             return;
-        this.detector.grab(name);
+        this.detector.grab(grabDir);
     }
 
     public void slow(float amount) {
@@ -225,7 +227,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     public boolean isGrabbing() {
         return this.detector.inGrab();
     }
-    public String getGrab() {
+    public GrabEnum getGrab() {
         return this.detector.curGrab();
     }
 
