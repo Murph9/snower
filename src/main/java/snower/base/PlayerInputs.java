@@ -1,13 +1,10 @@
 package snower.base;
 
-import java.util.LinkedList;
-
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 
-import snower.service.Grab;
 import snower.service.GrabListener;
 import snower.service.GrabMapper;
 
@@ -35,10 +32,7 @@ public class PlayerInputs implements ActionListener {
 
         im.addListener(this,"Lefts", "Rights", "Ups", "Downs", "Space", "Reset");
 
-        var grabs = new LinkedList<Grab>();
-        grabs.add(new Grab(KeyInput.KEY_1, "DownGrab"));
-        grabs.add(new Grab(KeyInput.KEY_2, "UpGrab"));
-        this.grabListener = new GrabListener(this, im, KeyInput.KEY_LSHIFT, grabs.toArray(new Grab[0]));
+        this.grabListener = new GrabListener(this, im, KeyInput.KEY_LSHIFT);
     }
 
     @Override

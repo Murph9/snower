@@ -101,9 +101,13 @@ public class SnowboarderAnimControl extends AbstractControl {
                 return "tail_grab";
             case UP:
                 return "nose_grab";
+            case LEFT:
+                return "mute_grab";
+            case RIGHT:
+                return "method_grab";
             default:
                 System.out.println("Unknown grab type: " + grab.getName());
-                return "Unknown grab + " + grab.getName();
+                return "0TPose";
         }
     }
 }
