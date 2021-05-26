@@ -15,7 +15,7 @@ public class TrickDetector {
     private float flipAngle;
 
     class TrickList {
-        private Trick[] tricks;
+        private final Trick[] tricks;
         public final boolean failed;
         public final boolean completed;
 
@@ -31,12 +31,12 @@ public class TrickDetector {
         public Trick[] getTricks() {
             return tricks;
         }
-        public boolean landedSwitch() {
+        public boolean switchedStance() {
             int spins = 0;
             for (Trick t: this.tricks) {
                 spins += t.spins;
             }
-            return spins % 2 == 0;
+            return spins % 2 == 1;
         }
 
         @Override

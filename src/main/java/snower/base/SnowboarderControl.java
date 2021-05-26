@@ -113,20 +113,17 @@ public class SnowboarderControl extends BetterCharacterControl {
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
             
             if (detector != null) {
-                var result = detector.stop();
-                if (result.hasTricks()) {
-                    this.curTrick = result;
-                    if (!result.landedSwitch()) {
-                        toggleSwitch();
-                    }
+                this.curTrick = detector.stop();
+                if (curTrick.switchedStance()) {
+                    toggleSwitch();
                 }
                 detector = null;
 
                 // trigger landing things
                 airRotAmount = 0;
                 airFlipAmount = 0;
-                
-                if (result.failed) {
+
+                if (this.curTrick.failed) {
                     crashing = CRASH_TIME;
                 }
             }
@@ -212,6 +209,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             if (speed < 0) {
                 if (toggleSwitch()) {
                     speed = 0;
+                    this.groundAngle = -this.groundAngle;
                     this.rotAmount += FastMath.PI;
                 }
             }
