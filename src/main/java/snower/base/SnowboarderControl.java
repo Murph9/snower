@@ -18,18 +18,21 @@ public class SnowboarderControl extends BetterCharacterControl {
     // TODO any getChild(0) reference is a hack
 
     private static final float MASS = 75;
-    private static final float GRAV_FALLING = 20;
+    private static final float GRAV_FALLING = 15;
     private static final float GRAV_GROUND = 40;
+
+    private static final float DRAG_CONST = 0.015f;
+    private static final float DUCK_DRAG_CONST = 0.004f;
+    private final float CalculatedMaxSpeed;
 
     private static final float CRASH_TIME = 2;
 
     private static final float ROT_SPEED = 2.5f;
-    private static final float DUCK_MOD = 1.4f;
-    private static final float SLOW_SPEED = 50;
+    private static final float SLOW_DOWN_SPEED = 50;
 
     private static final float SPIN_SPEED = 4.5f;
     private static final float FLIP_SPEED = 3.5f;
-    
+
     private final WorldState w;
 
     private float tempRotAmount;
@@ -59,6 +62,8 @@ public class SnowboarderControl extends BetterCharacterControl {
         setGravity(new Vector3f(0, -GRAV_GROUND, 0));
         setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
         setPhysicsDamping(0.2f);
+
+        this.CalculatedMaxSpeed = FastMath.sqrt(FastMath.sin(FastMath.DEG_TO_RAD*30)*GRAV_GROUND/(DRAG_CONST-DUCK_DRAG_CONST));
     }
 
     @Override
@@ -277,7 +282,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private float accelFromSlope() {
         var grav = this.getGravity(null);
-        return -FastMath.sin(groundAngle)*grav.length(); // TODO changing gravity changes this too much
+        return -FastMath.sin(groundAngle)*grav.length();
     }
 
     private float calcCharAngle() {
@@ -308,16 +313,23 @@ public class SnowboarderControl extends BetterCharacterControl {
     
     private void applyDrag(float tpf) {
         if (isOnGround() && slow > 0) {
-            speed -= SLOW_SPEED*slow*tpf;
+            speed -= SLOW_DOWN_SPEED*slow*tpf;
             if (speed < 0) {
                 speed = 0.25f; // you can't stop completely, fixes annoying flipping direction issues
             }
             return;
         }
 
-        // TODO do this with drag
-        float maxSpeed = 45 * (this.isDucked() ? DUCK_MOD : 1);
-        speed = Math.min(speed, maxSpeed);
+        // apply drag (quadratic version) but as a ground related drag (making jumping faster?)
+        if (isOnGround()) {
+            var duckDrag = this.isDucked() ? DUCK_DRAG_CONST : 0;
+            var drag = speed*speed*(DRAG_CONST - duckDrag)*tpf;
+            if (drag > speed) {
+                speed = 0;
+            } else {
+                speed -= drag/2;
+            }
+        }
 
         if (crashing > 0) {
             speed = Math.min(speed, 5); // while crashing prevent going faster than 5
@@ -327,7 +339,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     public String getDebugStr() {
         var sb = new StringBuilder();
         sb.append("Speed: " + getVelocity().length() + "\n");
-        sb.append("Ground char Speed: " + this.speed + "\n");
+        sb.append("(Max:" + Math.round(CalculatedMaxSpeed*100f)/100 + ") Ground speed: " + this.speed + "\n");
         sb.append("Rot: " + this.rotAmount + "\n");
         sb.append("Switch: " + this.switchStance + "\n");
         sb.append("Air flip: " + this.airFlipAmount + "\n");
