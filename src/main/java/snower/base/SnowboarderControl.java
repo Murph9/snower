@@ -69,6 +69,11 @@ public class SnowboarderControl extends BetterCharacterControl {
     
     public void resetPos() {
         warp(w.startPos());
+        
+        this.speed = 0;
+        this.rotAmount = 0;
+        this.airFlipAmount = 0;
+        this.curTrick = null;
     }
 
     public TrickList getTrick() {
@@ -130,9 +135,32 @@ public class SnowboarderControl extends BetterCharacterControl {
 
             var dtAirRot = tempRotAmount*tpf*SPIN_SPEED;
             var dtAirFlip = tempAirFlipAmount*tpf*FLIP_SPEED;
+
+            if (tempRotAmount == 0) {
+                // i.e. no input, attempt to snap to a multiple of PI to land successfully if its close to one
+                var closest = Math.round(airRotAmount/FastMath.PI) * FastMath.PI;
+                var diff = closest - airRotAmount;
+                if (Math.abs(diff) < FastMath.PI*3/8) {
+                    var sign = Math.signum(diff);
+                    if (diff < sign*tpf*SPIN_SPEED)
+                        dtAirRot += sign*tpf*SPIN_SPEED;
+                }
+            }
+
+            if (tempAirFlipAmount == 0) {
+                var closest = Math.round(airFlipAmount/FastMath.TWO_PI) * FastMath.TWO_PI;
+                var diff = closest - airFlipAmount;
+                if (Math.abs(diff) < FastMath.TWO_PI*3/8) {
+                    var sign = Math.signum(diff);
+                    if (diff < sign*tpf*FLIP_SPEED)
+                        dtAirFlip += sign*tpf*FLIP_SPEED;
+                }
+            }
+
             airRotAmount += dtAirRot;
             airFlipAmount += dtAirFlip;
             
+
             if (detector == null) {
                 detector = new TrickDetector();
             }
@@ -193,13 +221,6 @@ public class SnowboarderControl extends BetterCharacterControl {
         // else this will just keep the speed from the last call
 
         super.update(tpf);
-    }
-
-    public void reset() {
-        this.speed = 0;
-        this.rotAmount = 0;
-        this.airFlipAmount = 0;
-        this.curTrick = null;
     }
 
     public void turn(float amount) {
