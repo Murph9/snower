@@ -45,7 +45,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private float speed;
     private float slow;
 
-    private float groundAngle;
+    private final Vector3f groundAngles;
 
     private float switchStanceTimeout;
     private boolean switchStance;
@@ -58,6 +58,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         super(0.5f, 1.8f, MASS);
 
         this.w = w;
+        this.groundAngles = new Vector3f();
 
         setGravity(new Vector3f(0, -GRAV_GROUND, 0));
         setJumpForce(new Vector3f(0, MASS*GRAV_FALLING/2, 0));
@@ -182,11 +183,9 @@ public class SnowboarderControl extends BetterCharacterControl {
         setViewDirection(dir);
  
         // calc angle of ground
-        var newGroundAngle = calcCharAngle();
-        if (Float.isNaN(newGroundAngle)) //i.e. too far from slope to find it
-            newGroundAngle = 0;
-        groundAngle = FastMath.interpolateLinear(10*tpf, groundAngle, newGroundAngle);
-        
+        var newGroundAngles = getCharAngles();
+        groundAngles.interpolateLocal(newGroundAngles, 10*tpf);
+
         // char center pos is at feet - prevent weird rotation by moving the center of the character dynamically while in air
         if (airFlipAmount != 0) {
             var height = this.getFinalHeight();
@@ -198,8 +197,9 @@ public class SnowboarderControl extends BetterCharacterControl {
         }
         
         // set angle of character Node based on the floor angle
-        var rot = new Quaternion().fromAngles(airFlipAmount - groundAngle, 0, 0);
+        var rot = new Quaternion().fromAngles(airFlipAmount - groundAngles.x, 0, groundAngles.z);
         ((Node)getSpatial()).getChild(0).setLocalRotation(rot);
+        
         ((Node)getSpatial()).getChild(0).setLocalScale(1, 1, this.switchStance ? 1 : -1); // switch allows
         
         // calc drag
@@ -214,7 +214,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             if (speed < 0) {
                 if (toggleSwitch()) {
                     speed = 0;
-                    this.groundAngle = -this.groundAngle;
+                    this.groundAngles.setZ(-this.groundAngles.z);
                     this.rotAmount += FastMath.PI;
                 }
             }
@@ -245,7 +245,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public Quaternion getViewRot() {
-        return new Quaternion().fromAngleAxis(-groundAngle, Vector3f.UNIT_X);
+        return new Quaternion().fromAngleAxis(-groundAngles.x, Vector3f.UNIT_X);
     }
 
     public boolean isCrashing() {
@@ -282,18 +282,29 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     private float accelFromSlope() {
         var grav = this.getGravity(null);
-        return -FastMath.sin(groundAngle)*grav.length();
+        return -FastMath.sin(groundAngles.x)*grav.length();
     }
 
-    private float calcCharAngle() {
-        var dir = getSpatial().getWorldTransform().getRotation().mult(Vector3f.UNIT_Z).normalizeLocal();
-
+    private Vector3f getCharAngles() {
         // 'predict' the location of the ground (by doing my own ray cast)
         var pos = getSpatial().getWorldTranslation();
         var findPos = Helper.findFirstPosDown(pos.add(0, 1, 0), 500, this.getRigidBody());
         if (findPos != null)
             pos = findPos;
 
+        // get the angle in both x and z directions
+        var rot = getSpatial().getWorldTransform().getRotation();
+        var angle = calcCharAngle(pos, rot.mult(Vector3f.UNIT_Z));
+        if (Float.isNaN(angle))
+            angle = 0;
+        var latAngle = calcCharAngle(pos, rot.mult(Vector3f.UNIT_X));
+        if (Float.isNaN(latAngle))
+            latAngle = 0;
+
+        return new Vector3f(angle, 0, latAngle);
+    }
+
+    private float calcCharAngle(Vector3f pos, Vector3f dir) {
         // calc angle of char
         var frontPos = pos.add(dir).add(0, 1, 0);
         var rearPos = pos.subtract(dir).add(0, 1, 0);
@@ -302,7 +313,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
         if (frontHeight != -1 && rearHeight != -1) {
             float diffheight = rearHeight - frontHeight;
-            if (Math.abs(diffheight) > 4) //ignore weird large angles (like board height differences of more than 4m)
+            if (Math.abs(diffheight) > 2) //ignore weird large angles (like board height differences of more than 4m)
                 return Float.NaN;
             return FastMath.atan2(diffheight, 2);
         }
@@ -344,6 +355,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         sb.append("Switch: " + this.switchStance + "\n");
         sb.append("Air flip: " + this.airFlipAmount + "\n");
         sb.append("Air rot: " + this.airRotAmount + "\n");
+        sb.append("Ground angle: " + this.groundAngles + "\n");
         return sb.toString();
     }
 }
