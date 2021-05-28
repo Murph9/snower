@@ -390,7 +390,6 @@ public class SnowboarderControl extends BetterCharacterControl {
         landTrick();
         curRail = path;
 
-        this.setWalkDirection(curRail.end.subtract(curRail.start).normalize());
-        this.setViewDirection(curRail.end.subtract(curRail.start).normalize());
+        rotAmount = -FastMath.HALF_PI; // TODO really?
     }
 }
