@@ -1,0 +1,55 @@
+package snower.base;
+
+import com.jme3.asset.AssetManager;
+import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.PhysicsTickListener;
+import com.jme3.bullet.control.GhostControl;
+import com.jme3.bullet.objects.PhysicsRigidBody;
+import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
+
+public class SnowboarderRailDetector implements PhysicsTickListener {
+    
+    private final GhostControl ghost;
+
+    public SnowboarderRailDetector(AssetManager am, PhysicsSpace space, SnowboarderControl control) {
+        var playerNode = (Node)control.getSpatial();
+        var collisionGeom = new Geometry("ghost", new Box(0.5f, 0.5f, 0.5f));
+        Material mat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", ColorRGBA.Black);
+        collisionGeom.setMaterial(mat);
+        collisionGeom.setLocalTranslation(0, -0.8f, 0); // avoid the bettercharactercontrol, it doesn't ignore ghost controls // TODO fix when we say good bye to it
+        playerNode.attachChild(collisionGeom);
+
+        this.ghost = new GhostControl(CollisionShapeFactory.createBoxShape(collisionGeom));
+        collisionGeom.addControl(ghost);
+
+        space.add(ghost);
+        space.addTickListener(this);
+    }
+
+    @Override
+    public void prePhysicsTick(PhysicsSpace space, float timeStep) {
+        
+    }
+
+    @Override
+    public void physicsTick(PhysicsSpace space, float timeStep) {
+        var objects = this.ghost.getOverlappingObjects();
+        for (var obj: objects) {
+            if (obj instanceof PhysicsRigidBody) {
+                var body = (PhysicsRigidBody)obj;
+                if (!(body.getUserObject() instanceof Spatial))
+                    continue;
+                
+                var spat = (Spatial)body.getUserObject();
+                // TODO
+            }
+        }
+    }
+}

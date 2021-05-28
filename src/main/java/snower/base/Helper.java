@@ -33,6 +33,7 @@ public class Helper {
                 continue; // no self collision please
             if (!(result.getCollisionObject() instanceof PhysicsRigidBody))
                 continue;
+            
             return from.add(to.mult(result.getHitFraction()));
         }
 

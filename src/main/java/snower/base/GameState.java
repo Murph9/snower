@@ -35,6 +35,9 @@ public class GameState extends BaseAppState {
         controlNode.addControl(snower);
         Main.physicsSpace.add(snower);
         this.m.getRootNode().attachChild(controlNode);
+
+        // setup rail detection
+        new SnowboarderRailDetector(app.getAssetManager(), Main.physicsSpace, snower);
         
         // setup player inputs
         this.inputs = new PlayerInputs(app.getInputManager(), snower);
