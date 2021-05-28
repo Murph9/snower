@@ -8,6 +8,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import snower.base.TrickDetector.TrickList;
+import snower.base.WorldState.RailPath;
 import snower.service.GrabMapper;
 import snower.service.GrabMapper.GrabEnum;
 
@@ -54,6 +55,10 @@ public class SnowboarderControl extends BetterCharacterControl {
     private TrickList curTrick; // stores the current trick, or the last trick
     private TrickDetector detector;
     
+    private float railProgress;
+    private RailPath curRail;
+    private RailPath prevRail;
+
     public SnowboarderControl(WorldState w) {
         super(0.5f, 1.8f, MASS);
 
@@ -96,6 +101,25 @@ public class SnowboarderControl extends BetterCharacterControl {
             super.jump();
     }
 
+    private void landTrick() {
+        if (detector == null)
+            return;
+
+        this.curTrick = detector.stop();
+        if (curTrick.switchedStance()) {
+            toggleSwitch();
+        }
+        detector = null;
+
+        // trigger landing things
+        airRotAmount = 0;
+        airFlipAmount = 0;
+
+        if (this.curTrick.failed) {
+            crashing = CRASH_TIME;
+        }
+    }
+
     /**Toggle riding switch, returns if success */
     private boolean toggleSwitch() {
         if (this.switchStanceTimeout > 0)
@@ -111,28 +135,26 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (switchStanceTimeout > 0)
             switchStanceTimeout -= tpf;
 
-        if (isOnGround()) {
+        if (curRail != null) {
+            var loc = curRail.start.clone();
+            setPhysicsLocation(loc.interpolateLocal(curRail.end, railProgress));
+            railProgress += tpf*curRail.speed;
+            // System.out.println(this.getSpatialTranslation());
+            if (railProgress > 1) {
+                prevRail = curRail;
+                curRail = null;
+                railProgress = 0;
+                super.jump(); // hmmm
+            }
+        
+        } else if (isOnGround()) {
             // stick character to the ground to prevent annoying jumping
             // also ignore the BetterCharacterControl gravity setting, its confusingly broken here
             getRigidBody().setGravity(new Vector3f(0, -GRAV_GROUND, 0));
             
             rotAmount += tempRotAmount*tpf*ROT_SPEED;
             
-            if (detector != null) {
-                this.curTrick = detector.stop();
-                if (curTrick.switchedStance()) {
-                    toggleSwitch();
-                }
-                detector = null;
-
-                // trigger landing things
-                airRotAmount = 0;
-                airFlipAmount = 0;
-
-                if (this.curTrick.failed) {
-                    crashing = CRASH_TIME;
-                }
-            }
+            landTrick();
         } else {
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
@@ -255,6 +277,8 @@ public class SnowboarderControl extends BetterCharacterControl {
         return this.slow > 0.2f;
     }
     public boolean isGrabbing() {
+        if (this.detector == null)
+            return false;
         return this.detector.inGrab();
     }
     public GrabEnum getGrab() {
@@ -357,5 +381,16 @@ public class SnowboarderControl extends BetterCharacterControl {
         sb.append("Air rot: " + this.airRotAmount + "\n");
         sb.append("Ground angle: " + this.groundAngles + "\n");
         return sb.toString();
+    }
+
+    public void getOnRail(RailPath path) {
+        if (prevRail == path)
+            return; //TODO for now ignore the current rail
+        
+        landTrick();
+        curRail = path;
+
+        this.setWalkDirection(curRail.end.subtract(curRail.start).normalize());
+        this.setViewDirection(curRail.end.subtract(curRail.start).normalize());
     }
 }

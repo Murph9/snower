@@ -13,17 +13,22 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 
+import snower.base.WorldState.RailPath;
+
 public class SnowboarderRailDetector implements PhysicsTickListener {
     
     private final GhostControl ghost;
+    private final SnowboarderControl control;
 
     public SnowboarderRailDetector(AssetManager am, PhysicsSpace space, SnowboarderControl control) {
+        this.control = control;
+
         var playerNode = (Node)control.getSpatial();
-        var collisionGeom = new Geometry("ghost", new Box(0.5f, 0.5f, 0.5f));
+        var collisionGeom = new Geometry("ghost", new Box(0.2f, 0.1f, 0.8f));
         Material mat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Black);
         collisionGeom.setMaterial(mat);
-        collisionGeom.setLocalTranslation(0, -0.8f, 0); // avoid the bettercharactercontrol, it doesn't ignore ghost controls // TODO fix when we say good bye to it
+        collisionGeom.setLocalTranslation(0, -0.3f, 0); // avoid the bettercharactercontrol, it doesn't ignore ghost controls // TODO fix when we say good bye to it
         playerNode.attachChild(collisionGeom);
 
         this.ghost = new GhostControl(CollisionShapeFactory.createBoxShape(collisionGeom));
@@ -49,8 +54,15 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
                 
                 var spat = (Spatial)body.getUserObject();
                 var rail = spat.getUserData("rail");
-                if (rail != null) {
-                    System.out.println("Oh I found a rail?: " + rail);
+                if (rail == null)
+                    continue;
+                    
+                if (rail instanceof RailPath) {
+                    var path = (RailPath) rail;
+                    this.control.getOnRail(path);
+                    System.out.println("Oh I found a rail?: " + path);
+                } else {
+                    System.out.println("Rail with invalid type: " + rail);
                 }
             }
         }

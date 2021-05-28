@@ -1,11 +1,17 @@
 package snower.base;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.export.InputCapsule;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.JmeImporter;
+import com.jme3.export.OutputCapsule;
+import com.jme3.export.Savable;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -17,6 +23,41 @@ import com.jme3.scene.shape.Box;
 
 public class WorldState extends AbstractAppState {
     
+    class RailPath implements Savable {
+        public Vector3f start;
+        public Vector3f end;
+        public float speed;
+
+        public RailPath(Vector3f start, Vector3f end) {
+            this.start = start;
+            this.end = end;
+            this.speed = 1;
+        }
+
+        @Override
+        public void write(JmeExporter ex) throws IOException {
+            OutputCapsule capsule = ex.getCapsule(this);
+
+            capsule.write(start, "start", new Vector3f());
+            capsule.write(end, "end", new Vector3f());
+            capsule.write(speed, "speed", 1);
+        }
+
+        @Override
+        public void read(JmeImporter im) throws IOException {
+            InputCapsule capsule = im.getCapsule(this);
+
+            start = (Vector3f)capsule.readSavable("start", new Vector3f());
+            end = (Vector3f)capsule.readSavable("end", new Vector3f());
+            speed = capsule.readFloat("speed", 1);
+        }
+
+        @Override
+        public String toString() {
+            return "RailPath["+this.start+" | " + this.end + "]";
+        }
+    }
+
     private Main m;
     private List<Geometry> levels;
 
@@ -64,8 +105,9 @@ public class WorldState extends AbstractAppState {
             levels.add(baseLevel);
 
             // add a small rail after the jump
-
-            Geometry baseRail = new Geometry("level", new Box(0.2f, 2, 15));
+            var length = 15;
+            var height = 2;
+            Geometry baseRail = new Geometry("level", new Box(0.2f, height, length));
             Material baseRailMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             baseRailMat.setColor("Color", ColorRGBA.Gray);
             baseRail.setMaterial(baseRailMat);
@@ -73,7 +115,8 @@ public class WorldState extends AbstractAppState {
             baseRail.addControl(new RigidBodyControl(0));
             baseRail.setShadowMode(ShadowMode.CastAndReceive);
 
-            baseRail.setUserData("rail", "aaaa"); // TODO something that tells us how to 'move' on the rail (or just snap as we go?) MotionPath perhaps?
+            var pos = baseRail.getLocalTranslation();
+            baseRail.setUserData("rail", new RailPath(pos.add(0, height, -length), pos.add(0, height, length)));
             m.getRootNode().attachChild(baseRail);
             Main.physicsSpace.add(baseRail);
 
