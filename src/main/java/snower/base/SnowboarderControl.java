@@ -167,7 +167,7 @@ public class SnowboarderControl extends BetterCharacterControl {
                 var diff = closest - airRotAmount;
                 if (Math.abs(diff) < FastMath.PI*3/8) {
                     var sign = Math.signum(diff);
-                    if (diff < sign*tpf*SPIN_SPEED)
+                    if (sign*diff > sign*tpf*SPIN_SPEED)
                         dtAirRot += sign*tpf*SPIN_SPEED;
                 }
             }
@@ -177,7 +177,7 @@ public class SnowboarderControl extends BetterCharacterControl {
                 var diff = closest - airFlipAmount;
                 if (Math.abs(diff) < FastMath.TWO_PI*3/8) {
                     var sign = Math.signum(diff);
-                    if (diff < sign*tpf*FLIP_SPEED)
+                    if (sign*diff > sign*tpf*FLIP_SPEED)
                         dtAirFlip += sign*tpf*FLIP_SPEED;
                 }
             }
