@@ -48,7 +48,10 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
                     continue;
                 
                 var spat = (Spatial)body.getUserObject();
-                // TODO
+                var rail = spat.getUserData("rail");
+                if (rail != null) {
+                    System.out.println("Oh I found a rail?: " + rail);
+                }
             }
         }
     }

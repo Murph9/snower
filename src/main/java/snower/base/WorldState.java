@@ -42,8 +42,10 @@ public class WorldState extends AbstractAppState {
             base.setLocalRotation(new Quaternion().fromAngles(FastMath.QUARTER_PI/2, 0, 0));
             base.addControl(new RigidBodyControl(0));
             base.setShadowMode(ShadowMode.CastAndReceive);
+
             m.getRootNode().attachChild(base);
             Main.physicsSpace.add(base);
+            
             levels.add(base);
 
             
@@ -55,9 +57,27 @@ public class WorldState extends AbstractAppState {
             baseLevel.setLocalTranslation(0, -150*i, 360*i);
             baseLevel.addControl(new RigidBodyControl(0));
             baseLevel.setShadowMode(ShadowMode.CastAndReceive);
+
             m.getRootNode().attachChild(baseLevel);
             Main.physicsSpace.add(baseLevel);
+
             levels.add(baseLevel);
+
+            // add a small rail after the jump
+
+            Geometry baseRail = new Geometry("level", new Box(0.2f, 2, 15));
+            Material baseRailMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+            baseRailMat.setColor("Color", ColorRGBA.Gray);
+            baseRail.setMaterial(baseRailMat);
+            baseRail.setLocalTranslation(10, -150*i, 360*i + 30);
+            baseRail.addControl(new RigidBodyControl(0));
+            baseRail.setShadowMode(ShadowMode.CastAndReceive);
+
+            baseRail.setUserData("rail", "aaaa"); // TODO something that tells us how to 'move' on the rail (or just snap as we go?) MotionPath perhaps?
+            m.getRootNode().attachChild(baseRail);
+            Main.physicsSpace.add(baseRail);
+
+            levels.add(baseRail);
         }
     }
 
