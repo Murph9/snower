@@ -27,6 +27,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private final float CalculatedMaxSpeed;
 
     private static final float CRASH_TIME = 2;
+    private static final float RAIL_NO_TIME = 2;
 
     private static final float ROT_SPEED = 2.5f;
     private static final float SLOW_DOWN_SPEED = 50;
@@ -55,9 +56,9 @@ public class SnowboarderControl extends BetterCharacterControl {
     private TrickList curTrick; // stores the current trick, or the last trick
     private TrickDetector detector;
     
-    private float railProgress;
+    private float railTimeout;
     private RailPath curRail;
-    private RailPath prevRail;
+    private float railRotAmount;
 
     public SnowboarderControl(WorldState w) {
         super(0.5f, 1.8f, MASS);
@@ -101,6 +102,18 @@ public class SnowboarderControl extends BetterCharacterControl {
             super.jump();
     }
 
+    public void finishRailWithJump() {
+        if (this.curRail != null) {
+            this.curRail = null;
+            this.railTimeout = RAIL_NO_TIME;
+
+            this.airRotAmount = railRotAmount;
+            railRotAmount = 0;
+
+            this.jump();
+        }
+    }
+
     private void landTrick() {
         if (detector == null)
             return;
@@ -135,16 +148,22 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (switchStanceTimeout > 0)
             switchStanceTimeout -= tpf;
 
+        if (railTimeout > 0)
+            railTimeout -= tpf;
+
         if (curRail != null) {
-            var loc = curRail.start.clone();
-            setPhysicsLocation(loc.interpolateLocal(curRail.end, railProgress));
-            railProgress += tpf*curRail.speed;
-            // System.out.println(this.getSpatialTranslation());
-            if (railProgress > 1) {
-                prevRail = curRail;
-                curRail = null;
-                railProgress = 0;
-                super.jump(); // hmmm
+            getRigidBody().setGravity(new Vector3f(0, 0, 0));
+            
+            var pos = this.getRigidBody().getPhysicsLocation();
+            this.getRigidBody().setLinearVelocity(new Vector3f());
+
+            // TODO set rot to be the direction of the rail
+            var newPos = curRail.getClosestPos(pos);
+            if (newPos == null || newPos == curRail.end) {
+                this.finishRailWithJump();
+            } else {
+                this.setWalkDirection(curRail.end.subtract(curRail.start).normalize().mult(speed));
+                setPhysicsLocation(newPos);
             }
         
         } else if (isOnGround()) {
@@ -201,7 +220,7 @@ public class SnowboarderControl extends BetterCharacterControl {
         if (crashing > 0)
             crashing -= tpf;
 
-        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount+airRotAmount, 0).mult(Vector3f.UNIT_X);
+        var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount + airRotAmount + railRotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
  
         // calc angle of ground
@@ -349,7 +368,7 @@ public class SnowboarderControl extends BetterCharacterControl {
     private void applyDrag(float tpf) {
         if (isOnGround() && slow > 0) {
             speed -= SLOW_DOWN_SPEED*slow*tpf;
-            if (speed < 0) {
+            if (speed < 0.25f) {
                 speed = 0.25f; // you can't stop completely, fixes annoying flipping direction issues
             }
             return;
@@ -364,6 +383,10 @@ public class SnowboarderControl extends BetterCharacterControl {
             } else {
                 speed -= drag/2;
             }
+
+            if (speed < 1) {
+                speed = 1;
+            }
         }
 
         if (crashing > 0) {
@@ -373,6 +396,7 @@ public class SnowboarderControl extends BetterCharacterControl {
 
     public String getDebugStr() {
         var sb = new StringBuilder();
+        sb.append("Position:" + this.getSpatialTranslation() +"\n");
         sb.append("Speed: " + getVelocity().length() + "\n");
         sb.append("(Max:" + Math.round(CalculatedMaxSpeed*100f)/100 + ") Ground speed: " + this.speed + "\n");
         sb.append("Rot: " + this.rotAmount + "\n");
@@ -380,16 +404,18 @@ public class SnowboarderControl extends BetterCharacterControl {
         sb.append("Air flip: " + this.airFlipAmount + "\n");
         sb.append("Air rot: " + this.airRotAmount + "\n");
         sb.append("Ground angle: " + this.groundAngles + "\n");
+        sb.append("Rail: " + this.curRail + "\n");
         return sb.toString();
     }
 
     public void getOnRail(RailPath path) {
-        if (prevRail == path)
-            return; //TODO for now ignore the current rail
+        if (railTimeout > 0)
+            return; // still jumping from the previous rail
         
         landTrick();
         curRail = path;
 
-        rotAmount = -FastMath.HALF_PI; // TODO really?
+        railRotAmount = this.airRotAmount;
+        this.airRotAmount = 0;
     }
 }

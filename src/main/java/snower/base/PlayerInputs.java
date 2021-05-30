@@ -12,12 +12,14 @@ public class PlayerInputs implements ActionListener {
 
     private final InputManager im;
     private final SnowboarderControl snower;
+    private final SnowboarderRailDetector railDetector;
 
     private GrabListener grabListener;
 
-    public PlayerInputs(InputManager im, SnowboarderControl snower) {
+    public PlayerInputs(InputManager im, SnowboarderControl snower, SnowboarderRailDetector railDetector) {
         this.im = im;
         this.snower = snower;
+        this.railDetector = railDetector;
 
         setupKeys();
     }
@@ -29,8 +31,8 @@ public class PlayerInputs implements ActionListener {
         im.addMapping("Downs", new KeyTrigger(KeyInput.KEY_S));
         im.addMapping("Space", new KeyTrigger(KeyInput.KEY_SPACE));
         im.addMapping("Reset", new KeyTrigger(KeyInput.KEY_RETURN));
-
-        im.addListener(this,"Lefts", "Rights", "Ups", "Downs", "Space", "Reset");
+        im.addMapping("Rail", new KeyTrigger(KeyInput.KEY_E));
+        im.addListener(this,"Lefts", "Rights", "Ups", "Downs", "Space", "Reset", "Rail");
 
         this.grabListener = new GrabListener(this, im, KeyInput.KEY_LSHIFT);
     }
@@ -61,6 +63,10 @@ public class PlayerInputs implements ActionListener {
             if (value) snower.jump();
         } else if (binding.equals("Reset")) {
             if (value) snower.resetPos();
+        } else if (binding.equals("Rail")) {
+            railDetector.setEnabled(value);
+            if (!value)
+                this.snower.finishRailWithJump();
         }
     }
 

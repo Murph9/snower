@@ -26,12 +26,18 @@ public class WorldState extends AbstractAppState {
     class RailPath implements Savable {
         public Vector3f start;
         public Vector3f end;
-        public float speed;
 
         public RailPath(Vector3f start, Vector3f end) {
             this.start = start;
             this.end = end;
-            this.speed = 1;
+        }
+
+        public float totalDistance() {
+            return start.distance(end);
+        }
+
+        public Vector3f getClosestPos(Vector3f pos) {
+            return Helper.getClosestPos(start, end, pos);
         }
 
         @Override
@@ -40,7 +46,6 @@ public class WorldState extends AbstractAppState {
 
             capsule.write(start, "start", new Vector3f());
             capsule.write(end, "end", new Vector3f());
-            capsule.write(speed, "speed", 1);
         }
 
         @Override
@@ -49,7 +54,6 @@ public class WorldState extends AbstractAppState {
 
             start = (Vector3f)capsule.readSavable("start", new Vector3f());
             end = (Vector3f)capsule.readSavable("end", new Vector3f());
-            speed = capsule.readFloat("speed", 1);
         }
 
         @Override

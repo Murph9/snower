@@ -19,23 +19,39 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
     
     private final GhostControl ghost;
     private final SnowboarderControl control;
+    private final PhysicsSpace space;
+
+    private final Geometry collisionGeom;
 
     public SnowboarderRailDetector(AssetManager am, PhysicsSpace space, SnowboarderControl control) {
         this.control = control;
+        this.space = space;
 
-        var playerNode = (Node)control.getSpatial();
-        var collisionGeom = new Geometry("ghost", new Box(0.2f, 0.1f, 0.8f));
+        this.collisionGeom = new Geometry("ghost", new Box(0.2f, 0.1f, 0.8f));
         Material mat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Black);
         collisionGeom.setMaterial(mat);
         collisionGeom.setLocalTranslation(0, -0.3f, 0); // avoid the bettercharactercontrol, it doesn't ignore ghost controls // TODO fix when we say good bye to it
-        playerNode.attachChild(collisionGeom);
 
         this.ghost = new GhostControl(CollisionShapeFactory.createBoxShape(collisionGeom));
         collisionGeom.addControl(ghost);
 
-        space.add(ghost);
-        space.addTickListener(this);
+        this.setEnabled(false);
+    }
+
+    public void setEnabled(boolean value) {
+        
+
+        var playerNode = (Node)control.getSpatial();
+        if (value) {
+            playerNode.attachChild(collisionGeom);
+            space.add(ghost);
+            space.addTickListener(this);
+        } else {
+            playerNode.detachChild(collisionGeom);
+            space.remove(ghost);
+            space.removeTickListener(this);
+        }
     }
 
     @Override

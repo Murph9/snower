@@ -75,6 +75,22 @@ public class Helper {
 
         return new Vector3f[] {
             minX, maxX
-        };    
+        };
+    }
+
+    public static Vector3f getClosestPos(Vector3f start, Vector3f end, Vector3f point) {
+        var dir = point.subtract(start);
+        var result = dir.project(end.subtract(start)).add(start);
+
+        var distance = start.distance(end);
+        if (end.distance(result) > distance) { // before the start of the rail
+            return start;
+        }
+
+        if (start.distance(result) > distance) { // after the end of the rail
+            return end;
+        }
+
+        return result;
     }
 }
