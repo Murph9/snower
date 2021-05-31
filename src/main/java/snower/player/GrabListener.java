@@ -1,4 +1,4 @@
-package snower.service;
+package snower.player;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,8 +7,6 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-
-import snower.base.PlayerInputs;
 
 public class GrabListener implements ActionListener {
     

@@ -1,4 +1,4 @@
-package snower.service;
+package snower.player;
 
 public class GrabMapper {
     

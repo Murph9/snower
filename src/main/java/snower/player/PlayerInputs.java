@@ -1,12 +1,9 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-
-import snower.service.GrabListener;
-import snower.service.GrabMapper;
 
 public class PlayerInputs implements ActionListener {
 

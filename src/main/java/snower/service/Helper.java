@@ -1,4 +1,4 @@
-package snower.base;
+package snower.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.PhysicsRayTestResult;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Vector3f;
+
+import snower.base.Main;
 
 public class Helper {
     public static Vector3f findNormalAtPosDown(final Vector3f from, float rayLength, PhysicsCollisionObject self) {

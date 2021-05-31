@@ -1,4 +1,4 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -6,7 +6,8 @@ import com.jme3.app.state.BaseAppState;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.Label;
 
-import snower.base.TrickDetector.TrickList;
+import snower.base.DebugAppState;
+import snower.player.TrickDetector.TrickList;
 import snower.service.Screen;
 
 public class BoardingUI extends BaseAppState {

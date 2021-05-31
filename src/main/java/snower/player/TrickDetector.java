@@ -1,12 +1,11 @@
-package snower.base;
+package snower.player;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import com.jme3.math.FastMath;
 
-import snower.service.GrabMapper;
-import snower.service.GrabMapper.GrabEnum;
+import snower.player.GrabMapper.GrabEnum;
 
 public class TrickDetector {
     // TODO should this be a spatial control?

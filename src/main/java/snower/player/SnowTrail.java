@@ -1,4 +1,4 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -12,6 +12,8 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
+
+import snower.service.Helper;
 
 public class SnowTrail {
     //#region Trail fields
@@ -85,7 +87,7 @@ public class SnowTrail {
         return this.trailLine;
     }
 
-    protected void viewUpdate(float tpf, Vector3f[] boardExtents) {
+    public void viewUpdate(float tpf, Vector3f[] boardExtents) {
         if (boardExtents == null || boardExtents.length != 4) {
             //set trail end
             lastL = null;

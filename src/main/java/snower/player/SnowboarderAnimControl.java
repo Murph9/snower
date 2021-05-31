@@ -1,4 +1,4 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.anim.AnimComposer;
 import com.jme3.math.FastMath;
@@ -10,7 +10,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
-import snower.service.GrabMapper.GrabEnum;
+import snower.player.GrabMapper.GrabEnum;
 
 public class SnowboarderAnimControl extends AbstractControl {
 

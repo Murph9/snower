@@ -1,4 +1,4 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
@@ -13,7 +13,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 
-import snower.base.WorldState.RailPath;
+import snower.world.RailPath;
 
 public class SnowboarderRailDetector implements PhysicsTickListener {
     
@@ -40,8 +40,6 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
     }
 
     public void setEnabled(boolean value) {
-        
-
         var playerNode = (Node)control.getSpatial();
         if (value) {
             playerNode.attachChild(collisionGeom);
@@ -56,7 +54,7 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
 
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        
+        // nothing by choice
     }
 
     @Override

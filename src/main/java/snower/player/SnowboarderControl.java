@@ -1,4 +1,4 @@
-package snower.base;
+package snower.player;
 
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.FastMath;
@@ -8,10 +8,11 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-import snower.base.TrickDetector.TrickList;
-import snower.base.WorldState.RailPath;
-import snower.service.GrabMapper;
-import snower.service.GrabMapper.GrabEnum;
+import snower.world.RailPath;
+import snower.world.WorldState;
+import snower.player.GrabMapper.GrabEnum;
+import snower.player.TrickDetector.TrickList;
+import snower.service.Helper;
 
 public class SnowboarderControl extends BetterCharacterControl {
 
