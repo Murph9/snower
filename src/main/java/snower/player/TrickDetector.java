@@ -37,6 +37,27 @@ public class TrickDetector {
             }
             return spins % 2 == 1;
         }
+        public int getComboCount() {
+            if (tricks.length < 1)
+                return 1;
+
+            int total = 1;
+            for (int i = 1; i < tricks.length; i++) {
+                var tLast = tricks[i-1];
+                var tCur = tricks[i];
+                // count changes from: 
+                // - air trick to rail
+                if (!tLast.rail && tCur.rail)
+                    total++;
+                // - rail to air trick
+                if (tLast.rail && !tCur.rail)
+                    total++;
+                // - rail to rail
+                if (tLast.rail && tCur.rail)
+                    total++;
+            }
+            return total;
+        }
 
         @Override
         public String toString() {
@@ -63,26 +84,25 @@ public class TrickDetector {
         public int frontFlips;
         public int backFlips;
         public GrabEnum grab;
+        public boolean rail;
 
         public boolean anyValidTrick() {
-            return backFlips != 0 || frontFlips != 0 || grab != null || spins != 0;
+            return backFlips != 0 || frontFlips != 0 || grab != null || spins != 0 || rail;
         }
 
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            if (spins > 0) {
+            if (spins > 0)
                 sb.append(spins*180 + "' ");
-            }
-            if (frontFlips > 0) {
+            if (frontFlips > 0)
                 sb.append(frontFlips + " frontflip ");
-            }
-            if (backFlips > 0) {
+            if (backFlips > 0)
                 sb.append(backFlips + " backflip ");
-            }
-            if (grab != null) {
+            if (grab != null)
                 sb.append(grab.getName());
-            }
+            if (rail)
+                sb.append("Grind ");
             return sb.toString().trim();
         }
     }
@@ -102,6 +122,29 @@ public class TrickDetector {
     }
     public GrabEnum curGrab() {
         return curTrick.grab;
+    }
+
+    /**Start a rail, returns whether it creates a combo */
+    public boolean startRail() {
+        if (curTrick.anyValidTrick()) {
+            curTrick = new Trick();
+            curTrick.rail = true;
+            tricks.add(curTrick);
+            return true;
+        } else {
+            curTrick.rail = true;
+            return false;
+        }
+    }
+
+    public void finishRail() {
+        if (!curTrick.rail) {
+            System.out.println("Finished a rail without starting one.");
+            return;
+        }
+
+        curTrick = new Trick();
+        tricks.add(curTrick);
     }
 
     public void update(float dRotAngle, float dFlipAngle) {

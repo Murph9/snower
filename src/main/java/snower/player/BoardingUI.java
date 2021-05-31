@@ -17,6 +17,7 @@ public class BoardingUI extends BaseAppState {
     private final SnowboarderControl control;
 
     private Container trickView;
+    private Label comboText;
     private Label trickText;
     private Container debugView;
     private Label debugText;
@@ -31,6 +32,7 @@ public class BoardingUI extends BaseAppState {
     @Override
     public void initialize(Application app) {
         this.trickView = new Container();
+        this.comboText = this.trickView.addChild(new Label(""));
         this.trickText = this.trickView.addChild(new Label(""));
 		((SimpleApplication)app).getGuiNode().attachChild(this.trickView);
 
@@ -44,6 +46,10 @@ public class BoardingUI extends BaseAppState {
         // get trick, if not completed show it
         var trick = control.getTrick();
         if (trick != null) {
+            int comboCount = trick.getComboCount();
+            if (comboCount > 1) // woo at least 'a' combo
+                this.comboText.setText(comboCount + "x combo!");
+
             this.trickText.setText(trick.toString());
             if (trick.completed) {
                 this.trickText.setText(trick.toString());

@@ -84,6 +84,8 @@ public class SnowboarderControl extends BetterCharacterControl {
     public void resetPos() {
         warp(w.startPos());
         
+        this.getRigidBody().setLinearVelocity(new Vector3f());
+        this.getRigidBody().setAngularVelocity(new Vector3f());
         this.speed = 0;
         this.rotAmount = 0;
         this.airFlipAmount = 0;
@@ -104,7 +106,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             super.jump();
     }
 
-    public void finishRailWithJump() {
+    public void finishRail(boolean withJump) {
         if (this.curRail != null) {
             this.curRail = null;
             this.railTimeout = RAIL_NO_TIME;
@@ -112,7 +114,10 @@ public class SnowboarderControl extends BetterCharacterControl {
             this.airRotAmount = railRotAmount;
             railRotAmount = 0;
 
-            this.jump();
+            if (withJump)
+                this.jump();
+
+            detector.finishRail();
         }
     }
 
@@ -162,7 +167,7 @@ public class SnowboarderControl extends BetterCharacterControl {
             // TODO set rot to be the direction of the rail
             var newPos = curRail.getClosestPos(pos);
             if (newPos == null || newPos == curRail.end) {
-                this.finishRailWithJump();
+                this.finishRail(false);
             } else {
                 this.setWalkDirection(curRail.end.subtract(curRail.start).normalize().mult(speed));
                 setPhysicsLocation(newPos);
@@ -425,5 +430,10 @@ public class SnowboarderControl extends BetterCharacterControl {
         // calculate rail direction and set that to my current direction
         Vector2f railDirXZ = new Vector2f(path.getRailDirection().x, path.getRailDirection().z);
         this.rotAmount = -railDirXZ.getAngle();
+
+        if (detector == null)
+            detector = new TrickDetector();
+        
+        detector.startRail();
     }
 }

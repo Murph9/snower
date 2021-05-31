@@ -63,7 +63,7 @@ public class PlayerInputs implements ActionListener {
         } else if (binding.equals("Rail")) {
             railDetector.setEnabled(value);
             if (!value)
-                this.snower.finishRailWithJump();
+                this.snower.finishRail(true);
         }
     }
 
