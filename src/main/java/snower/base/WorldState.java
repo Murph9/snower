@@ -33,7 +33,11 @@ public class WorldState extends AbstractAppState {
         }
 
         public float totalDistance() {
-            return start.distance(end);
+            return end.distance(start);
+        }
+
+        public Vector3f getRailDirection() {
+            return end.subtract(start).normalizeLocal();
         }
 
         public Vector3f getClosestPos(Vector3f pos) {
@@ -70,7 +74,7 @@ public class WorldState extends AbstractAppState {
     }
 
     public Vector3f startPos() {
-        return new Vector3f(0, 150/2, -360/2);
+        return new Vector3f(0, 75/2, -180/2);
     }
 
     @Override
@@ -79,11 +83,11 @@ public class WorldState extends AbstractAppState {
 
         for (int i = 0; i < 2; i++) {
             // add level
-            Geometry base = new Geometry("level", new Box(200, 2, 200));
+            Geometry base = new Geometry("level", new Box(100, 2, 100));
             Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             baseMat.setColor("Color", ColorRGBA.LightGray);
             base.setMaterial(baseMat);
-            base.setLocalTranslation(0, -150*i, 360*i);
+            base.setLocalTranslation(0, -75*i, 180*i);
             base.setLocalRotation(new Quaternion().fromAngles(FastMath.QUARTER_PI/2, 0, 0));
             base.addControl(new RigidBodyControl(0));
             base.setShadowMode(ShadowMode.CastAndReceive);
@@ -99,7 +103,7 @@ public class WorldState extends AbstractAppState {
             Material baseLevelMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             baseLevelMat.setColor("Color", ColorRGBA.Brown);
             baseLevel.setMaterial(baseLevelMat);
-            baseLevel.setLocalTranslation(0, -150*i, 360*i);
+            baseLevel.setLocalTranslation(0, -75*i, 180*i);
             baseLevel.addControl(new RigidBodyControl(0));
             baseLevel.setShadowMode(ShadowMode.CastAndReceive);
 
@@ -115,7 +119,7 @@ public class WorldState extends AbstractAppState {
             Material baseRailMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             baseRailMat.setColor("Color", ColorRGBA.Gray);
             baseRail.setMaterial(baseRailMat);
-            baseRail.setLocalTranslation(10, -150*i, 360*i + 30);
+            baseRail.setLocalTranslation(10, -75*i, 180*i + 30);
             baseRail.addControl(new RigidBodyControl(0));
             baseRail.setShadowMode(ShadowMode.CastAndReceive);
 

@@ -3,6 +3,7 @@ package snower.base;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -409,13 +410,19 @@ public class SnowboarderControl extends BetterCharacterControl {
     }
 
     public void getOnRail(RailPath path) {
+        if (isCrashing())
+            return; //can't rail while crashing
         if (railTimeout > 0)
             return; // still jumping from the previous rail
-        
+           
         landTrick();
         curRail = path;
 
         railRotAmount = this.airRotAmount;
         this.airRotAmount = 0;
+
+        // calculate rail direction and set that to my current direction
+        Vector2f railDirXZ = new Vector2f(path.getRailDirection().x, path.getRailDirection().z);
+        this.rotAmount = -railDirXZ.getAngle();
     }
 }
