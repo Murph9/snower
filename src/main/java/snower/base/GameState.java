@@ -13,6 +13,7 @@ import snower.player.SnowTrail;
 import snower.player.SnowboarderAnimControl;
 import snower.player.SnowboarderControl;
 import snower.player.SnowboarderRailDetector;
+import snower.service.DebugAppState;
 import snower.service.Helper;
 import snower.world.WorldState;
 
