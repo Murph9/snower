@@ -187,6 +187,11 @@ public class SnowboarderControl extends ControlBase {
         } else {
             getRigidBody().setGravity(new Vector3f(0, -GRAV_FALLING, 0));
 
+            if (detector == null) {
+                //i.e. just got off the ground
+                detector = new TrickDetector();
+            }
+
             var dtAirRot = tempRotAmount*tpf*SPIN_SPEED;
             var dtAirFlip = tempAirFlipAmount*tpf*FLIP_SPEED;
 
@@ -214,14 +219,7 @@ public class SnowboarderControl extends ControlBase {
             airRotAmount += dtAirRot;
             airFlipAmount += dtAirFlip;
             
-
-            if (detector == null) {
-                detector = new TrickDetector();
-            }
-
-            detector.update(dtAirRot, dtAirFlip);
-
-            var result = detector.progress();
+            var result = detector.update(dtAirRot, dtAirFlip);
             if (result != null & result.hasTricks()) {
                 curTrick = result;
             }

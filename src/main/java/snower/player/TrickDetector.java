@@ -9,6 +9,9 @@ import snower.player.GrabMapper.GrabEnum;
 
 public class TrickDetector {
     
+    private final float TRICK_RAD_FRACTION = 0.2f; // within 10 percent
+    private final float TRICK_RAD_LENIENCY = 1 - TRICK_RAD_FRACTION;
+
     private float rotAngle;
     private float flipAngle;
 
@@ -101,7 +104,7 @@ public class TrickDetector {
             if (grab != null)
                 sb.append(grab.getName());
             if (rail)
-                sb.append("Grind ");
+                sb.append("Grind");
             return sb.toString().trim();
         }
     }
@@ -123,30 +126,7 @@ public class TrickDetector {
         return curTrick.grab;
     }
 
-    /**Start a rail, returns whether it creates a combo */
-    public boolean startRail() {
-        if (curTrick.anyValidTrick()) {
-            curTrick = new Trick();
-            curTrick.rail = true;
-            tricks.add(curTrick);
-            return true;
-        } else {
-            curTrick.rail = true;
-            return false;
-        }
-    }
-
-    public void finishRail() {
-        if (!curTrick.rail) {
-            System.out.println("Finished a rail without starting one.");
-            return;
-        }
-
-        curTrick = new Trick();
-        tricks.add(curTrick);
-    }
-
-    public void update(float dRotAngle, float dFlipAngle) {
+    public TrickList update(float dRotAngle, float dFlipAngle) {
         rotAngle += dRotAngle;
         flipAngle += dFlipAngle;
 
@@ -169,7 +149,11 @@ public class TrickDetector {
             curTrick.backFlips++;
             flipAngle += FastMath.TWO_PI;
         }
+
+        var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
+        return new TrickList(false, false, validTricks);
     }
+
     public void grab(GrabMapper.GrabEnum grab) {
         inTrick = grab != null;
 
@@ -185,28 +169,41 @@ public class TrickDetector {
         }
     }
 
-    public TrickList progress() {
-        var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
-        return new TrickList(false, false, validTricks);
+    /**Start a rail, returns whether it creates a combo */
+    public boolean startRail() {
+        if (curTrick.anyValidTrick()) {
+            curTrick = new Trick();
+            curTrick.rail = true;
+            tricks.add(curTrick);
+            return true;
+        }
+
+        curTrick.rail = true;
+        return false;
+    }
+
+    public void finishRail() {
+        assert !curTrick.rail;
+        
+        curTrick = new Trick();
+        tricks.add(curTrick);
     }
 
     public TrickList stop() {
-        // some leniency, and set to 0 to show we landed correctly (on the last trick only)
-        final float FRACTION = 0.2f; // within 10 percent
-        final float LENIENCY = 1 - FRACTION;
-        if (Math.abs(rotAngle) > FastMath.PI*LENIENCY) {
+        // detect some very close to finishing tricks and set to 0 to show we landed correctly
+        if (Math.abs(rotAngle) > FastMath.PI*TRICK_RAD_LENIENCY) {
             curTrick.spins++;
             rotAngle = 0;
         }
-        if (flipAngle > FastMath.TWO_PI*LENIENCY) {
+        if (flipAngle > FastMath.TWO_PI*TRICK_RAD_LENIENCY) {
             curTrick.frontFlips++;
             flipAngle = 0;
         }
-        if (flipAngle < -FastMath.TWO_PI*LENIENCY) {
+        if (flipAngle < -FastMath.TWO_PI*TRICK_RAD_LENIENCY) {
             curTrick.backFlips++;
             flipAngle = 0;
         }
-        var failed = inTrick || Math.abs(rotAngle) > FRACTION || Math.abs(flipAngle) > FRACTION;
+        var failed = inTrick || Math.abs(rotAngle) > FastMath.PI*TRICK_RAD_FRACTION || Math.abs(flipAngle) > FastMath.TWO_PI*TRICK_RAD_FRACTION;
         
         var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
         var trickList = new TrickList(failed, true, validTricks);
