@@ -88,8 +88,11 @@ public class SnowboarderControl extends ControlBase {
         
         this.getRigidBody().setLinearVelocity(new Vector3f());
         this.getRigidBody().setAngularVelocity(new Vector3f());
+        
         this.speed = 0;
         this.rotAmount = 0;
+        this.crashing = 0;
+        this.airRotAmount = 0;
         this.airFlipAmount = 0;
         this.curTrick = null;
     }
@@ -104,7 +107,7 @@ public class SnowboarderControl extends ControlBase {
 
     @Override
     public void jump() {
-        if (!isCrashing())
+        if (!isCrashing() || curRail != null)
             super.jump();
     }
 
@@ -249,13 +252,13 @@ public class SnowboarderControl extends ControlBase {
         var rot = new Quaternion().fromAngles(airFlipAmount - groundAngles.x, 0, groundAngles.z);
         ((Node)getSpatial()).getChild(0).setLocalRotation(rot);
         
-        ((Node)getSpatial()).getChild(0).setLocalScale(1, 1, this.switchStance ? 1 : -1); // switch allows
+        ((Node)getSpatial()).getChild(0).setLocalScale(1, 1, this.switchStance ? 1 : -1); // switch allows mirroring of moves
         
         // calc drag
         applyDrag(tpf);
 
         // calc acceleration
-        speed += tpf * accelFromSlope();
+        speed += tpf * -FastMath.sin(groundAngles.x)*this.getGravity(null).y;
 
         // apply speed
         if (this.isOnGround()) {
@@ -293,10 +296,6 @@ public class SnowboarderControl extends ControlBase {
         slow = amount;
     }
 
-    public Quaternion getViewRot() {
-        return new Quaternion().fromAngleAxis(-groundAngles.x, Vector3f.UNIT_X);
-    }
-
     public boolean isCrashing() {
         return this.crashing > 0;
     }
@@ -312,7 +311,7 @@ public class SnowboarderControl extends ControlBase {
         return this.detector.curGrab();
     }
 
-    public Vector3f[] getBoardExtents() {
+    public Vector3f[] getExpectedBoardExtents() {
         // TODO calc this in anim control with nodes on the actual character
 
         final float BOARD_WIDTH = 0.15f;
@@ -329,11 +328,6 @@ public class SnowboarderControl extends ControlBase {
             worldRot.mult(Vector3f.UNIT_Z.clone().negateLocal().addLocal(-BOARD_WIDTH, 0, 0)).addLocal(pos)
         };
         return extents;
-    }
-
-    private float accelFromSlope() {
-        var grav = this.getGravity(null);
-        return -FastMath.sin(groundAngles.x)*grav.length();
     }
 
     private Vector3f getCharAngles() {

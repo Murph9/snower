@@ -83,7 +83,7 @@ public class GameState extends BaseAppState {
     public void update(float tpf) {
         var debug = m.getStateManager().getState(DebugAppState.class);
 
-        var extents = snower.getBoardExtents();
+        var extents = snower.getExpectedBoardExtents();
         if (snower.isOnGround()) {
             trail.viewUpdate(tpf, extents);
         } else {
