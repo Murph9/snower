@@ -27,11 +27,11 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
         this.control = control;
         this.space = space;
 
-        this.collisionGeom = new Geometry("ghost", new Box(0.2f, 0.1f, 0.8f));
+        this.collisionGeom = new Geometry("ghost", new Box(0.2f, 0.2f, 0.8f));
         Material mat = new Material(am, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.Black);
         collisionGeom.setMaterial(mat);
-        collisionGeom.setLocalTranslation(0, -0.3f, 0); // avoid the bettercharactercontrol, it doesn't ignore ghost controls // TODO fix when we say good bye to it
+        collisionGeom.setLocalTranslation(0, -0.2f, 0);
 
         this.ghost = new GhostControl(CollisionShapeFactory.createBoxShape(collisionGeom));
         collisionGeom.addControl(ghost);
@@ -74,9 +74,8 @@ public class SnowboarderRailDetector implements PhysicsTickListener {
                 if (rail instanceof RailPath) {
                     var path = (RailPath) rail;
                     this.control.getOnRail(path);
-                    System.out.println("Oh I found a rail?: " + path);
                 } else {
-                    System.out.println("Rail with invalid type: " + rail);
+                    System.out.println("!!!! Rail with invalid type: " + rail);
                 }
             }
         }

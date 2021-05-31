@@ -1,6 +1,5 @@
 package snower.player;
 
-import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
@@ -14,11 +13,7 @@ import snower.player.GrabMapper.GrabEnum;
 import snower.player.TrickDetector.TrickList;
 import snower.service.Helper;
 
-public class SnowboarderControl extends BetterCharacterControl {
-
-    // TODO write my own BetterCharacterControl :( sadly its getting in the way of custom stuff
-    
-    // TODO any getChild(0) reference is a hack
+public class SnowboarderControl extends ControlBase {
 
     private static final float MASS = 75;
     private static final float GRAV_FALLING = 15;
@@ -78,6 +73,13 @@ public class SnowboarderControl extends BetterCharacterControl {
     @Override
     public void setSpatial(Spatial newSpatial) {
         super.setSpatial(newSpatial);
+
+        // validate some assumptions made in the class, to protect all the uses of .getChild(0)
+        assert newSpatial instanceof Node;
+        var children = ((Node)newSpatial).getChildren();
+        assert children.size() == 1;
+        assert children.get(0) instanceof Spatial;
+
         resetPos();
     }
     
@@ -164,11 +166,12 @@ public class SnowboarderControl extends BetterCharacterControl {
             var pos = this.getRigidBody().getPhysicsLocation();
             this.getRigidBody().setLinearVelocity(new Vector3f());
 
-            // TODO set rot to be the direction of the rail
+            // calc position based on location
             var newPos = curRail.getClosestPos(pos);
             if (newPos == null || newPos == curRail.end) {
                 this.finishRail(false);
             } else {
+                // set rot to be the direction of the rail
                 this.setWalkDirection(curRail.end.subtract(curRail.start).normalize().mult(speed));
                 setPhysicsLocation(newPos);
             }
@@ -420,7 +423,9 @@ public class SnowboarderControl extends BetterCharacterControl {
             return; //can't rail while crashing
         if (railTimeout > 0)
             return; // still jumping from the previous rail
-           
+
+        System.out.println("Oh I got on a rail: " + path);
+
         landTrick();
         curRail = path;
 

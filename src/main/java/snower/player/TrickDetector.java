@@ -8,7 +8,6 @@ import com.jme3.math.FastMath;
 import snower.player.GrabMapper.GrabEnum;
 
 public class TrickDetector {
-    // TODO should this be a spatial control?
     
     private float rotAngle;
     private float flipAngle;
