@@ -15,7 +15,7 @@ import snower.player.SnowboarderControl;
 import snower.player.SnowboarderRailDetector;
 import snower.service.DebugAppState;
 import snower.service.Helper;
-import snower.world.WorldState;
+import snower.world.StaticWorldState;
 
 public class GameState extends BaseAppState {
     
@@ -33,15 +33,14 @@ public class GameState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-
-        WorldState world = new WorldState(this.m);
-        app.getStateManager().attach(world);
+        StaticWorldState slope = new StaticWorldState();
+        app.getStateManager().attach(slope);
 
         // add player model
         var controlNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
         var playerNode = ((Node)controlNode).getChild(0);
         playerNode.setShadowMode(ShadowMode.CastAndReceive);
-        snower = new SnowboarderControl(world);
+        snower = new SnowboarderControl(slope);
         controlNode.addControl(snower);
         Main.physicsSpace.add(snower);
         this.m.getRootNode().attachChild(controlNode);
@@ -73,7 +72,7 @@ public class GameState extends BaseAppState {
         snower.getSpatial().removeFromParent();
 
         app.getStateManager().detach(app.getStateManager().getState(BoardingUI.class));
-        app.getStateManager().detach(app.getStateManager().getState(WorldState.class));
+        app.getStateManager().detach(app.getStateManager().getState(StaticWorldState.class));
         app.getStateManager().detach(app.getStateManager().getState(PullCam.class));
 
         inputs.remove();

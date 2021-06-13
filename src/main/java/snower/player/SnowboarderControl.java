@@ -8,7 +8,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import snower.world.RailPath;
-import snower.world.WorldState;
+import snower.world.StaticWorldState;
 import snower.player.GrabMapper.GrabEnum;
 import snower.player.TrickDetector.TrickList;
 import snower.service.Helper;
@@ -32,7 +32,7 @@ public class SnowboarderControl extends ControlBase {
     private static final float SPIN_SPEED = 4.5f;
     private static final float FLIP_SPEED = 3.5f;
 
-    private final WorldState w;
+    private final StaticWorldState w;
 
     private float tempRotAmount;
     private float rotAmount;
@@ -59,7 +59,7 @@ public class SnowboarderControl extends ControlBase {
     private RailPath curRail;
     private float railRotAmount;
 
-    public SnowboarderControl(WorldState w) {
+    public SnowboarderControl(StaticWorldState w) {
         super(0.5f, 1.8f, MASS);
 
         this.w = w;
@@ -92,7 +92,7 @@ public class SnowboarderControl extends ControlBase {
         this.getRigidBody().setAngularVelocity(new Vector3f());
         
         this.speed = 0;
-        this.rotAmount = -FastMath.HALF_PI;
+        this.rotAmount = 0;
         this.crashing = 0;
         this.airRotAmount = 0;
         this.airFlipAmount = 0;
