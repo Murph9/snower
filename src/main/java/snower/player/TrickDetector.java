@@ -17,15 +17,18 @@ public class TrickDetector {
 
     class TrickList {
         private final Trick[] tricks;
-        public final boolean failed;
+        public final String failedReason;
         public final boolean completed;
 
-        public TrickList(boolean failed, boolean completed, Trick ...tricks) {
+        public TrickList(String failedReason, boolean completed, Trick ...tricks) {
             this.tricks = tricks;
-            this.failed = failed;
+            this.failedReason = failedReason;
             this.completed = completed;
         }
 
+        public boolean failed() {
+            return failedReason != null;
+        }
         public boolean hasTricks() {
             return tricks.length > 0;
         }
@@ -64,7 +67,7 @@ public class TrickDetector {
         @Override
         public String toString() {
             if (tricks.length < 1) {
-                return this.failed ? "[Failed]" : null;
+                return this.failed() ? "[Failed]" : null;
             }
             
             StringBuilder sb = new StringBuilder();
@@ -74,7 +77,7 @@ public class TrickDetector {
                 sb.append(tricks[i]);
             }
             
-            if (this.failed) {
+            if (this.failed()) {
                 sb.append(": Failed");
             }
             return sb.toString();
@@ -151,7 +154,7 @@ public class TrickDetector {
         }
 
         var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
-        return new TrickList(false, false, validTricks);
+        return new TrickList(null, false, validTricks);
     }
 
     public void grab(GrabMapper.GrabEnum grab) {
@@ -203,10 +206,16 @@ public class TrickDetector {
             curTrick.backFlips++;
             flipAngle = 0;
         }
-        var failed = inTrick || Math.abs(rotAngle) > FastMath.PI*TRICK_RAD_FRACTION || Math.abs(flipAngle) > FastMath.TWO_PI*TRICK_RAD_FRACTION;
-        
+        String failedReason = null;
+        if (inTrick)
+            failedReason = "Still grabbing";
+        if (Math.abs(rotAngle) > FastMath.PI*TRICK_RAD_FRACTION)
+            failedReason = "Still rotating";
+        if (Math.abs(flipAngle) > FastMath.TWO_PI*TRICK_RAD_FRACTION)
+            failedReason = "Still flipping";
+
         var validTricks = tricks.stream().filter(x -> x.anyValidTrick()).toArray(Trick[]::new);
-        var trickList = new TrickList(failed, true, validTricks);
+        var trickList = new TrickList(failedReason, true, validTricks);
         return trickList;
     }
 }

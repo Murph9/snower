@@ -144,9 +144,9 @@ public class SnowboarderControl extends ControlBase {
         airRotAmount = 0;
         airFlipAmount = 0;
 
-        if (this.curTrick.failed) {
+        if (this.curTrick.failed()) {
             crashing = CRASH_TIME;
-            crashedReason = "Trick failure";
+            crashedReason = this.curTrick.failedReason;
         }
     }
 
