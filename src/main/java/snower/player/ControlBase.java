@@ -705,6 +705,10 @@ public class ControlBase extends AbstractPhysicsControl implements PhysicsTickLi
                 continue; // not a real rigid body, so ignore
             if (physicsRayTestResult.getCollisionObject().equals(rigidBody))
                 continue; // self
+            var spat = (Spatial)physicsRayTestResult.getCollisionObject().getUserObject();
+            var rail = spat.getUserData("rail");
+            if (rail != null)
+                continue; // ignore because its a rail, we don't collide with these yet
             
             onGround = true;
             return;

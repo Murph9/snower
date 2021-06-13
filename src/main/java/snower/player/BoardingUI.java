@@ -49,10 +49,11 @@ public class BoardingUI extends BaseAppState {
             int comboCount = trick.getComboCount();
             if (comboCount > 1) // woo at least 'a' combo
                 this.comboText.setText(comboCount + "x combo!");
+            else
+                this.comboText.setText("");
 
             this.trickText.setText(trick.toString());
             if (trick.completed) {
-                this.trickText.setText(trick.toString());
                 if (prevTrick != trick)
                     trickTextTimer = TRICK_MESSAGE_TIMEOUT;
 

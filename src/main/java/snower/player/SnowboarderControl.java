@@ -48,7 +48,9 @@ public class SnowboarderControl extends ControlBase {
 
     private float switchStanceTimeout;
     private boolean switchStance;
+    
     private float crashing;
+    private String crashedReason;
 
     private TrickList curTrick; // stores the current trick, or the last trick
     private TrickDetector detector;
@@ -90,11 +92,13 @@ public class SnowboarderControl extends ControlBase {
         this.getRigidBody().setAngularVelocity(new Vector3f());
         
         this.speed = 0;
-        this.rotAmount = 0;
+        this.rotAmount = -FastMath.HALF_PI;
         this.crashing = 0;
         this.airRotAmount = 0;
         this.airFlipAmount = 0;
         this.curTrick = null;
+        this.curRail = null; // ignore any active rail
+        this.detector = null; //ignore any active trick
     }
 
     public TrickList getTrick() {
@@ -142,6 +146,7 @@ public class SnowboarderControl extends ControlBase {
 
         if (this.curTrick.failed) {
             crashing = CRASH_TIME;
+            crashedReason = "Trick failure";
         }
     }
 
@@ -153,6 +158,12 @@ public class SnowboarderControl extends ControlBase {
         this.switchStance = !this.switchStance;
         this.switchStanceTimeout = 1;
         return true;
+    }
+
+    @Override
+    protected void checkOnGround() {
+        if (curRail == null) // no ground checks while on a rail
+            super.checkOnGround();
     }
 
     @Override
@@ -386,9 +397,7 @@ public class SnowboarderControl extends ControlBase {
                 speed -= drag/2;
             }
 
-            if (speed < 1) {
-                speed = 1;
-            }
+            speed = Math.max(speed, 2);
         }
 
         if (crashing > 0) {
@@ -400,6 +409,8 @@ public class SnowboarderControl extends ControlBase {
         var sb = new StringBuilder();
         sb.append("Position:" + this.getSpatialTranslation() +"\n");
         sb.append("Speed: " + getVelocity().length() + "\n");
+        sb.append("On Ground: " + isOnGround() + "\n");
+        sb.append("Crashing: " + (isCrashing() ? "true " + crashedReason : "false") + "\n");
         sb.append("(Max:" + Math.round(CalculatedMaxSpeed*100f)/100 + ") Ground speed: " + this.speed + "\n");
         sb.append("Rot: " + this.rotAmount + "\n");
         sb.append("Switch: " + this.switchStance + "\n");
@@ -415,10 +426,11 @@ public class SnowboarderControl extends ControlBase {
             return; //can't rail while crashing
         if (railTimeout > 0)
             return; // still jumping from the previous rail
+        if (this.curRail == path)
+            return;
 
         System.out.println("Oh I got on a rail: " + path);
 
-        landTrick();
         curRail = path;
 
         railRotAmount = this.airRotAmount;
