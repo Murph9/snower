@@ -34,7 +34,7 @@ public class WorldState extends AbstractAppState {
     public void stateAttached(AppStateManager stateManager) {
         levels = new LinkedList<>();
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             // add level
             Geometry base = new Geometry("level", new Box(100, 2, 100));
             Material baseMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
@@ -65,24 +65,31 @@ public class WorldState extends AbstractAppState {
 
             levels.add(baseLevel);
 
-            // add a small rail after the jump
-            var length = 15;
-            var height = 2;
-            Geometry baseRail = new Geometry("level", new Box(0.2f, height, length));
-            Material baseRailMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            baseRailMat.setColor("Color", ColorRGBA.Gray);
-            baseRail.setMaterial(baseRailMat);
-            baseRail.setLocalTranslation(10, -75*i, 180*i + 30);
-            baseRail.addControl(new RigidBodyControl(0));
-            baseRail.setShadowMode(ShadowMode.CastAndReceive);
+            // add some small rails
+            var rail = createRail(new Vector3f(10, -75*i, 180*i + 30), 30, 2);
+            m.getRootNode().attachChild(rail);
+            Main.physicsSpace.add(rail);
 
-            var pos = baseRail.getLocalTranslation();
-            baseRail.setUserData("rail", new RailPath(pos.add(0, height, -length), pos.add(0, height, length)));
-            m.getRootNode().attachChild(baseRail);
-            Main.physicsSpace.add(baseRail);
+            rail = createRail(new Vector3f(0, -75*i, 180*i + 30), 15, 2);
+            m.getRootNode().attachChild(rail);
+            Main.physicsSpace.add(rail);
 
-            levels.add(baseRail);
+            levels.add(rail);
         }
+    }
+
+    private Geometry createRail(Vector3f translation, float length, float height) {
+        Geometry baseRail = new Geometry("level", new Box(0.2f, height, length));
+        Material baseRailMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        baseRailMat.setColor("Color", ColorRGBA.Black);
+        baseRail.setMaterial(baseRailMat);
+        baseRail.setLocalTranslation(translation);
+        baseRail.addControl(new RigidBodyControl(0));
+        baseRail.setShadowMode(ShadowMode.CastAndReceive);
+
+        var pos = baseRail.getLocalTranslation();
+        baseRail.setUserData("rail", new RailPath(pos.add(0, height, -length), pos.add(0, height, length)));
+        return baseRail;
     }
 
     @Override
