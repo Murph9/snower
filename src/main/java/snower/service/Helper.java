@@ -23,7 +23,7 @@ public class Helper {
             return new RayResult(from.add(to.mult(result.getHitFraction())), result.getHitNormalLocal(), Math.min(rayLength, result.getHitFraction() * rayLength));
         }
 
-        return null;
+        return new RayResult(null, null, -1);
     }
 
     public static Vector3f findNormalAtPosDown(final Vector3f from, float rayLength, PhysicsCollisionObject self) {

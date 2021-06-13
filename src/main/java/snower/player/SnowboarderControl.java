@@ -258,7 +258,7 @@ public class SnowboarderControl extends ControlBase {
         applyDrag(tpf);
 
         // calc acceleration
-        speed += tpf * -FastMath.sin(groundAngles.x)*this.getGravity(null).y;
+        speed += tpf * FastMath.sin(groundAngles.x)*this.getGravity(null).y;
 
         // apply speed
         if (this.isOnGround()) {
