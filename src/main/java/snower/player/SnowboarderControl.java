@@ -429,7 +429,13 @@ public class SnowboarderControl extends ControlBase {
         if (this.curRail == path)
             return;
 
-        System.out.println("Oh I got on a rail: " + path);
+        if (detector != null && detector.inGrab()) {
+            this.crashing = CRASH_TIME;
+            this.crashedReason = "In-grab and hit rail";
+            return;
+        }
+
+        System.out.println("A rail: " + path);
 
         curRail = path;
 

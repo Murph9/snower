@@ -52,7 +52,7 @@ public class WorldState extends AbstractAppState {
 
             
             // add small 'jump'
-            Geometry baseLevel = new Geometry("level", new Box(20, 2, 20));
+            Geometry baseLevel = new Geometry("level", new Box(10, 2, 10));
             Material baseLevelMat = new Material(m.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             baseLevelMat.setColor("Color", ColorRGBA.Brown);
             baseLevel.setMaterial(baseLevelMat);
@@ -66,11 +66,11 @@ public class WorldState extends AbstractAppState {
             levels.add(baseLevel);
 
             // add some small rails
-            var rail = createRail(new Vector3f(10, -75*i, 180*i + 30), 30, 2);
+            var rail = createRail(new Vector3f(10, -75*i, 180*i + 20), 15, 2);
             m.getRootNode().attachChild(rail);
             Main.physicsSpace.add(rail);
 
-            rail = createRail(new Vector3f(0, -75*i, 180*i + 30), 15, 2);
+            rail = createRail(new Vector3f(0, -75*i, 180*i + 10), 10, 2);
             m.getRootNode().attachChild(rail);
             Main.physicsSpace.add(rail);
 
