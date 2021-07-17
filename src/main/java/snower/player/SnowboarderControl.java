@@ -242,6 +242,8 @@ public class SnowboarderControl extends ControlBase {
         if (crashing > 0)
             crashing -= tpf;
 
+        wallCollisionDetection();
+
         var dir = Quaternion.IDENTITY.fromAngles(0, rotAmount + airRotAmount + railRotAmount, 0).mult(Vector3f.UNIT_X);
         setViewDirection(dir);
  
@@ -269,7 +271,8 @@ public class SnowboarderControl extends ControlBase {
         applyDrag(tpf);
 
         // calc acceleration
-        speed += tpf * FastMath.sin(groundAngles.x)*this.getGravity(null).y;
+        if (isOnGround())
+            speed += tpf * FastMath.sin(groundAngles.x)*this.getGravity(null).y;
 
         // apply speed
         if (this.isOnGround()) {
@@ -405,14 +408,23 @@ public class SnowboarderControl extends ControlBase {
         }
     }
 
+    private void wallCollisionDetection() {
+        var vel = getVelocity();
+        if (vel.length() < speed*0.85f) {
+            speed = 1;
+        }
+
+        // very primitive, need to 'bounce' off of walls
+    }
+
     public String getDebugStr() {
         var sb = new StringBuilder();
-        sb.append("Position:" + this.getSpatialTranslation() +"\n");
-        sb.append("Speed: " + getVelocity().length() + "\n");
         sb.append("On Ground: " + isOnGround() + "\n");
         sb.append("Crashing: " + (isCrashing() ? "true " + crashedReason : "false") + "\n");
         sb.append("(Max:" + Math.round(CalculatedMaxSpeed*100f)/100 + ") Ground speed: " + this.speed + "\n");
+        sb.append("Speed: " + getVelocity().length() + "\n");
         sb.append("Rot: " + this.rotAmount + "\n");
+        sb.append("Position:" + this.getSpatialTranslation() +"\n");
         sb.append("Switch: " + this.switchStance + "\n");
         sb.append("Air flip: " + this.airFlipAmount + "\n");
         sb.append("Air rot: " + this.airRotAmount + "\n");
