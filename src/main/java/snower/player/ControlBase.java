@@ -120,6 +120,7 @@ public class ControlBase extends AbstractPhysicsControl implements PhysicsTickLi
         rigidBody = new PhysicsRigidBody(getShape(), mass);
         jumpForce = new Vector3f(0f, mass * 5f, 0f);
         rigidBody.setAngularFactor(0f);
+        rigidBody.setRestitution(0);
     }
 
     /**
@@ -696,7 +697,7 @@ public class ControlBase extends AbstractPhysicsControl implements PhysicsTickLi
         Vector3f rayVector = vars.vect2;
         float scaledHeight = getFinalHeight();
         loc.set(localUp).multLocal(scaledHeight).addLocal(location);
-        rayVector.set(localUp).multLocal(-scaledHeight - 0.1f).addLocal(loc);
+        rayVector.set(localUp).multLocal(-scaledHeight - 0.2f).addLocal(loc);
         List<PhysicsRayTestResult> results = getPhysicsSpace().rayTestRaw(loc, rayVector);
         vars.release();
 
@@ -737,7 +738,7 @@ public class ControlBase extends AbstractPhysicsControl implements PhysicsTickLi
         var radius = getFinalRadius();
         var height = getFinalHeight();
         CapsuleCollisionShape capsuleCollisionShape = new CapsuleCollisionShape(radius, (height - (2f * radius)));
-        CompoundCollisionShape compoundCollisionShape = new CompoundCollisionShape(1); 
+        CompoundCollisionShape compoundCollisionShape = new CompoundCollisionShape(1);
         compoundCollisionShape.addChildShape(capsuleCollisionShape, 0f, height / 2f, 0f);
 
         return compoundCollisionShape;
