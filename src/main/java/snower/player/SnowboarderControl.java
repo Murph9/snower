@@ -294,7 +294,9 @@ public class SnowboarderControl extends ControlBase {
             }
 
             this.setWalkDirection(dir.mult(speed));
-        }
+        } else if (this.isCrashing()) {
+            this.setWalkDirection(dir.mult(speed));
+        }   
         // else this will just keep the speed from the last call
 
         super.update(tpf);
@@ -420,11 +422,8 @@ public class SnowboarderControl extends ControlBase {
         // TODO calc collision direction from walkdir and difference in speed
         
         var vel = getVelocity();
-        if (vel.length() < speed*0.85f) {
-            speed = 1;
-        }
-        
         if (!isCrashing() && vel.length() < speed*0.5f) {
+            speed = 1;
             rotAmount += FastMath.PI;
             crashing = CRASH_TIME;
             crashedReason = "Hit wall";
