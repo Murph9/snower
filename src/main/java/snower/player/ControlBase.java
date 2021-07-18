@@ -120,7 +120,6 @@ public class ControlBase extends AbstractPhysicsControl implements PhysicsTickLi
         rigidBody = new PhysicsRigidBody(getShape(), mass);
         jumpForce = new Vector3f(0f, mass * 5f, 0f);
         rigidBody.setAngularFactor(0f);
-        rigidBody.setRestitution(0);
     }
 
     /**
