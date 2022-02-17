@@ -10,26 +10,6 @@ repositories {
     mavenCentral()
 }
 
-project(":assets") {
-    apply plugin: "java"
-    
-    buildDir = rootProject.file("build/assets")
-    
-    sourceSets {
-        main {
-            resources {
-                srcDir '.'
-                include '**'
-                exclude '**/*.blend'
-                exclude '**/*.ps1'
-                exclude '**/*.py'
-                exclude '**/*.blend1'
-                exclude 'bin/*'
-            }
-        }
-    }
-}
-
 task createFatJar(type: Jar) {
     archiveBaseName = 'snower'
 
@@ -66,6 +46,4 @@ dependencies {
     
     implementation 'com.github.stephengold:Minie:4.1.0+for33'
     implementation "com.simsilica:lemur:1.14.0"
-
-    runtimeOnly project(':assets')
 }
