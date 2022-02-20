@@ -43,7 +43,7 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         BulletAppState bullet = new BulletAppState();
-        bullet.setDebugEnabled(false);
+        bullet.setDebugEnabled(true);
         getStateManager().attach(bullet);
         physicsSpace = bullet.getPhysicsSpace();
 

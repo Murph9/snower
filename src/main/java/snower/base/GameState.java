@@ -8,6 +8,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Node;
 
 import snower.player.BoardingUI;
+import snower.player.FloatingSnowControl;
 import snower.player.PlayerInputs;
 import snower.player.SnowTrail;
 import snower.player.SnowboarderAnimControl;
@@ -24,6 +25,7 @@ public class GameState extends BaseAppState {
     private Main m;
     private SnowTrail trail;
     private SnowboarderControl snower;
+    //private FloatingSnowControl newSnower;
 
     private PlayerInputs inputs;
 
@@ -33,14 +35,16 @@ public class GameState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-        StaticWorldState slope = new StaticWorldState();
-        app.getStateManager().attach(slope);
+        var world = new StaticWorldState();
+        app.getStateManager().attach(world);
+
+        
 
         // add player model
         var controlNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
         var playerNode = ((Node)controlNode).getChild(0);
         playerNode.setShadowMode(ShadowMode.CastAndReceive);
-        snower = new SnowboarderControl(slope);
+        snower = new SnowboarderControl(world);
         controlNode.addControl(snower);
         Main.physicsSpace.add(snower);
         this.m.getRootNode().attachChild(controlNode);

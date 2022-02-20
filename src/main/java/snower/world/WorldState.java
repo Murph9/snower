@@ -17,7 +17,7 @@ import com.jme3.scene.shape.Box;
 
 import snower.base.Main;
 
-public class WorldState extends AbstractAppState {
+public class WorldState extends AbstractAppState implements IWorld {
     
     private Main m;
     private List<Geometry> levels;

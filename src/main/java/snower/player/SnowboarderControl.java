@@ -1,8 +1,5 @@
 package snower.player;
 
-import com.jme3.bullet.collision.PhysicsCollisionEvent;
-import com.jme3.bullet.collision.PhysicsCollisionListener;
-import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
@@ -10,9 +7,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import snower.world.IWorld;
 import snower.world.RailPath;
-import snower.world.StaticWorldState;
-import snower.base.Main;
 import snower.player.GrabMapper.GrabEnum;
 import snower.player.TrickDetector.TrickList;
 import snower.service.Helper;
@@ -36,8 +32,7 @@ public class SnowboarderControl extends ControlBase {
     private static final float SPIN_SPEED = 4.5f;
     private static final float FLIP_SPEED = 3.5f;
 
-    private final StaticWorldState w;
-    private final CollisionDir collisionDir;
+    private final IWorld w;
 
     private float tempRotAmount;
     private float rotAmount;
@@ -64,7 +59,7 @@ public class SnowboarderControl extends ControlBase {
     private RailPath curRail;
     private float railRotAmount;
 
-    public SnowboarderControl(StaticWorldState w) {
+    public SnowboarderControl(IWorld w) {
         super(0.5f, 1.8f, MASS);
 
         this.w = w;
@@ -75,9 +70,6 @@ public class SnowboarderControl extends ControlBase {
         setPhysicsDamping(0.2f);
 
         this.CalculatedMaxSpeed = FastMath.sqrt(FastMath.sin(FastMath.DEG_TO_RAD*30)*GRAV_GROUND/(DRAG_CONST-DUCK_DRAG_CONST));
-
-        this.collisionDir = new CollisionDir(this.getRigidBody());
-        Main.physicsSpace.addCollisionListener(this.collisionDir);
     }
 
     @Override
@@ -483,21 +475,5 @@ public class SnowboarderControl extends ControlBase {
             detector = new TrickDetector();
         
         detector.startRail();
-    }
-
-    class CollisionDir implements PhysicsCollisionListener {
-
-        private final PhysicsCollisionObject obj;
-        CollisionDir(PhysicsCollisionObject obj) {
-            this.obj = obj;
-        }
-
-        @Override
-        public void collision(PhysicsCollisionEvent event) {
-            if (event.getObjectA() != obj && event.getObjectB() != obj)
-                return;
-
-            System.out.println("Impulse = " + event.getAppliedImpulse());
-        }
     }
 }
