@@ -25,7 +25,7 @@ public class GameState extends BaseAppState {
     private Main m;
     private SnowTrail trail;
     private SnowboarderControl snower;
-    //private FloatingSnowControl newSnower;
+    private FloatingSnowControl newSnower;
 
     private PlayerInputs inputs;
 
@@ -38,7 +38,15 @@ public class GameState extends BaseAppState {
         var world = new StaticWorldState();
         app.getStateManager().attach(world);
 
+        // new char
+        var controlNode2 = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
+        controlNode2.setLocalTranslation(world.startPos());
+        controlNode2.setShadowMode(ShadowMode.CastAndReceive);
         
+        newSnower = new FloatingSnowControl(world);
+        controlNode2.addControl(newSnower);
+        this.m.getRootNode().attachChild(controlNode2);
+        Main.physicsSpace.add(newSnower);
 
         // add player model
         var controlNode = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
