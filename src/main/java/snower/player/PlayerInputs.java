@@ -8,12 +8,12 @@ import com.jme3.input.controls.KeyTrigger;
 public class PlayerInputs implements ActionListener {
 
     private final InputManager im;
-    private final SnowboarderControl snower;
+    private final ISnowControl snower;
     private final SnowboarderRailDetector railDetector;
 
     private GrabListener grabListener;
 
-    public PlayerInputs(InputManager im, SnowboarderControl snower, SnowboarderRailDetector railDetector) {
+    public PlayerInputs(InputManager im, ISnowControl snower, SnowboarderRailDetector railDetector) {
         this.im = im;
         this.snower = snower;
         this.railDetector = railDetector;
@@ -57,9 +57,9 @@ public class PlayerInputs implements ActionListener {
                 snower.slow(0);
             }
         } else if (binding.equals("Space")) {
-            if (value) snower.jump();
+            if (value) snower.jump(1);
         } else if (binding.equals("Reset")) {
-            if (value) snower.resetPos();
+            if (value) snower.reset();
         } else if (binding.equals("Rail")) {
             railDetector.setEnabled(value);
             if (!value)

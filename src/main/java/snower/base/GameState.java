@@ -72,7 +72,7 @@ public class GameState extends BaseAppState {
 
         // camera
         Camera cam = m.getCamera();
-        PullCam camera = new PullCam(cam, controlNode);
+        PullCam camera = new PullCam(cam, controlNode2);
         app.getStateManager().attach(camera);
 
         BoardingUI ui = new BoardingUI(snower);

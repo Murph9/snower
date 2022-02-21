@@ -75,4 +75,8 @@ public class Helper {
 
         return result;
     }
+
+    public static Vector3f getXZNormalized(Vector3f in) {
+        return new Vector3f(in.x, 0, in.z).normalize();
+    }
 }

@@ -13,7 +13,7 @@ import snower.player.GrabMapper.GrabEnum;
 import snower.player.TrickDetector.TrickList;
 import snower.service.Helper;
 
-public class SnowboarderControl extends ControlBase {
+public class SnowboarderControl extends ControlBase implements ISnowControl {
 
     private static final float MASS = 75;
     private static final float GRAV_FALLING = 15;
@@ -82,10 +82,11 @@ public class SnowboarderControl extends ControlBase {
         assert children.size() == 1;
         assert children.get(0) instanceof Spatial;
 
-        resetPos();
+        reset();
     }
     
-    public void resetPos() {
+    @Override
+    public void reset() {
         warp(w.startPos());
         
         this.getRigidBody().setLinearVelocity(new Vector3f());
@@ -110,7 +111,7 @@ public class SnowboarderControl extends ControlBase {
     }
 
     @Override
-    public void jump() {
+    public void jump(float amount) {
         if (!isCrashing() || curRail != null)
             super.jump();
     }
