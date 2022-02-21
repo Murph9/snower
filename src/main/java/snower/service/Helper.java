@@ -12,7 +12,8 @@ import snower.base.Main;
 
 public class Helper {
     public static RayResult findClosestResult(final Vector3f from, float rayLength, PhysicsCollisionObject self, boolean ignoreGhost) {
-        Vector3f to = new Vector3f(from.x, from.y - rayLength, from.z);
+        Vector3f diff = new Vector3f(0, - rayLength, 0);
+        Vector3f to = from.add(diff);
         List<PhysicsRayTestResult> results = new ArrayList<>();
         Main.physicsSpace.rayTest(from, to, results);
         for (PhysicsRayTestResult result : results) {
@@ -20,7 +21,7 @@ public class Helper {
                 continue; // no self collision please
             if (ignoreGhost && !(result.getCollisionObject() instanceof PhysicsRigidBody))
                 continue;
-            return new RayResult(from.add(to.mult(result.getHitFraction())), result.getHitNormalLocal(), Math.min(rayLength, result.getHitFraction() * rayLength));
+            return new RayResult(from.add(diff.mult(result.getHitFraction())), result.getHitNormalLocal(), Math.min(rayLength, result.getHitFraction() * rayLength));
         }
 
         return new RayResult(null, null, -1);
