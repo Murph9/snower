@@ -115,10 +115,7 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
 
     @Override
     public void physicsTick(PhysicsSpace space, float tpf) {
-        keepAboveGround(tpf);
-    }
-
-    private void keepAboveGround(float tpf) {
+        // keep above the ground
         Vector3f loc = rigidBody.getPhysicsLocation().add(0, -0.4f, 0); // bottom of the sphere
         float susLength = 0.5f;
         var rayResult = Helper.findClosestResult(loc, susLength, rigidBody, true);

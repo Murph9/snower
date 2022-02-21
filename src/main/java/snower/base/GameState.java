@@ -61,6 +61,7 @@ public class GameState extends BaseAppState {
         var railDetector = new SnowboarderRailDetector(app.getAssetManager(), Main.physicsSpace, snower);
         
         // setup player inputs
+        new PlayerInputs(app.getInputManager(), newSnower, railDetector);
         this.inputs = new PlayerInputs(app.getInputManager(), snower, railDetector);
 
         // setup animation control
