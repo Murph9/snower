@@ -32,6 +32,7 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
         rigidBody = new RigidBodyControl(s, mass);
         rigidBody.setFriction(1); // TODO set to 0 when the spring works
         rigidBody.setAngularFactor(0f);
+        rigidBody.setLinearDamping(0.15f); //TODO test
 
         sus = new RaySuspension(rigidBody, 30f, 0.2f);
     }
