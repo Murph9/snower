@@ -1,6 +1,8 @@
 package snower.player;
 
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
 import snower.world.IWorld;
@@ -11,6 +13,8 @@ public class FloatingSnowControl extends FloatingControl {
 
     private final IWorld w;
     private final Vector3f jumpForce;
+
+    private Vector3f forward;
 
     public FloatingSnowControl(IWorld w) {
         super(MASS);
@@ -25,7 +29,7 @@ public class FloatingSnowControl extends FloatingControl {
         var normal = super.getGroundNormal();
         if (normal != null) {
             // calc forward vector (ignoring vertical part)
-            var forward = rigidBody.getLinearVelocity();
+            forward = rigidBody.getLinearVelocity();
             forward.y = 0;
             forward.normalizeLocal();
 
@@ -43,5 +47,18 @@ public class FloatingSnowControl extends FloatingControl {
     @Override
     public void physicsTick(PhysicsSpace space, float tpf) {
         super.physicsTick(space, tpf);
+    }
+
+    @Override
+    public void update(float tpf) {
+        super.update(tpf);
+
+        var normal = this.getGroundNormal();
+        if (normal != null && forward != null) {
+            // update char based on ground direction
+            // the char wants to be down the wrong X or Z axis, so rotate
+            var side = new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y).mult(forward);
+            this.charSpatial.setLocalRotation(new Quaternion().lookAt(side, normal));
+        }
     }
 }

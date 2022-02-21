@@ -8,6 +8,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import snower.service.Helper;
@@ -16,9 +17,11 @@ import snower.service.RaySuspension;
 public class FloatingControl extends AbstractPhysicsControl implements PhysicsTickListener {
     protected final PhysicsRigidBody rigidBody;
     private final RaySuspension sus;
-
+    
     private final Vector3f location = new Vector3f();
-    private final Quaternion rotation = new Quaternion(Quaternion.DIRECTION_Z);
+    private final Quaternion rotation = new Quaternion();
+
+    protected Spatial charSpatial;
 
     private Vector3f groundLocation = new Vector3f();
     private Vector3f groundNormal = new Vector3f();
@@ -34,8 +37,26 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
     }
 
     public Vector3f getGroundLocation() { return groundLocation; }
+    public Vector3f getGroundLocationInLocalSpatial() {
+        if (groundLocation == null) return null;
+        var out = new Vector3f();
+        return this.getSpatial().worldToLocal(groundLocation, out);
+    }
     public Vector3f getGroundNormal() { return groundNormal; }
     
+    @Override
+    public void setSpatial(Spatial newSpatial) {
+        super.setSpatial(newSpatial);
+
+        // validate some assumptions made in the class, to protect all the uses of .getChild(0)
+        assert newSpatial instanceof Node;
+        var children = ((Node)newSpatial).getChildren();
+        assert children.size() == 1;
+        assert children.get(0) instanceof Spatial;
+
+        charSpatial = children.get(0);
+    }
+
     @Override
     public void update(float tpf) {
         if (!isEnabled()) {
@@ -45,6 +66,10 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
         rigidBody.getPhysicsLocation(location);
         rigidBody.getPhysicsRotation(rotation);
         applyPhysicsTransform(location, rotation);
+
+        var pos = getGroundLocationInLocalSpatial();
+        if (pos != null)
+            charSpatial.setLocalTranslation(pos); //set the bottom of the char to ground
     }
 
     @Override
@@ -93,7 +118,7 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
     }
 
     private void keepAboveGround(float tpf) {
-        Vector3f loc = new Vector3f().set(rigidBody.getPhysicsLocation()).addLocal(0, -0.4f, 0); // bottom of the sphere
+        Vector3f loc = rigidBody.getPhysicsLocation().add(0, -0.4f, 0); // bottom of the sphere
         float susLength = 0.5f;
         var rayResult = Helper.findClosestResult(loc, susLength, rigidBody, true);
 
