@@ -14,7 +14,7 @@ public class BoardingUI extends BaseAppState {
 
     private static final float TRICK_MESSAGE_TIMEOUT = 5; //seconds
 
-    private final SnowboarderControl control;
+    private final ISnowControl control;
 
     private Container trickView;
     private Label comboText;
@@ -25,7 +25,7 @@ public class BoardingUI extends BaseAppState {
     private TrickList prevTrick;
     private float trickTextTimer;
 
-    public BoardingUI(SnowboarderControl control) {
+    public BoardingUI(ISnowControl control) {
         this.control = control;
     }
 

@@ -6,6 +6,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
 import snower.player.GrabMapper.GrabEnum;
+import snower.player.TrickDetector.TrickList;
 import snower.service.Helper;
 import snower.world.IWorld;
 
@@ -141,6 +142,26 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
 
     @Override
     public void grab(GrabEnum type) {
-        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public String getDebugStr() {
+        var sb = new StringBuilder();
+        sb.append("On Ground: " + isOnGround() + "\n");
+        sb.append("Crashing: " + (this.charControl.isCrashing() ? "true " + this.charControl.crashingReason() : "false") + "\n");
+        sb.append("Speed: " + velocity.length() + "\n");
+        sb.append("Rot: " + this.turnAmount + "\n");
+        sb.append("Position:" + this.getSpatialTranslation() +"\n");
+        sb.append("Switch: " + this.charControl.isSwitch() + "\n");
+        // sb.append("Air flip: " + this.charControl.??? + "\n");
+        // sb.append("Air rot: " + this.charControl.??? + "\n");
+        sb.append("Ground angle: " + this.getGroundNormal() + "\n");
+        //sb.append("Rail: " + this.curRail + "\n");
+        return sb.toString();
+    }
+
+    @Override
+    public TrickList getTrick() {
+        return this.charControl.getTrick();
     }
 }
