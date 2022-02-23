@@ -26,6 +26,7 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
     private Vector3f groundLocation = new Vector3f();
     private Vector3f groundNormal = new Vector3f();
     protected final Vector3f velocity = new Vector3f();
+    protected float distanceToGround = -1;
 
     public FloatingControl(float mass) {
         var s = new SphereCollisionShape(0.5f);
@@ -124,11 +125,18 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
             groundLocation = null;
             groundNormal = null;
         } else {
+            // assume tpf is for the previous frame
+            float relativeGroundVelocity = 0;
+            if (groundLocation != null)
+                relativeGroundVelocity = (groundLocation.y - rayResult.pos.y)/tpf;
             groundLocation = rayResult.pos;
             groundNormal = rayResult.normal;
 
-            var result = sus.calcSusResult(rayResult.distance, susLength);
+            var result = sus.calcSusResult(rayResult.distance, susLength, relativeGroundVelocity);
             rigidBody.applyCentralImpulse(new Vector3f(0, rigidBody.getMass()*result*tpf, 0));
         }
+
+        var distanceResult = Helper.findClosestResult(loc, 100, rigidBody, true);
+        distanceToGround = distanceResult.distance;
     }
 }

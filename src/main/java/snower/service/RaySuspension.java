@@ -14,9 +14,9 @@ public class RaySuspension {
         this.damping = damping;
     }
 
-    public float calcSusResult(float distance, float rayLength) {
+    public float calcSusResult(float distance, float rayLength, float contactVelocity) {
         float denominator = distance;
-        float relative_vel = -body.getLinearVelocity().y;
+        float relative_vel = -body.getLinearVelocity().y - contactVelocity;
 
         float inv = -1f / denominator;
         relative_vel = relative_vel * inv;
