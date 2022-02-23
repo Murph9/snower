@@ -50,13 +50,15 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
     public void setSpatial(Spatial newSpatial) {
         super.setSpatial(newSpatial);
 
-        // validate some assumptions made in the class, to protect all the uses of .getChild(0)
+        // validate FloatingControl.ConvertToFloatingSpatial was used
         assert newSpatial instanceof Node;
         var children = ((Node)newSpatial).getChildren();
         assert children.size() == 1;
-        assert children.get(0) instanceof Spatial;
+        assert children.get(0) instanceof Node;
 
         charSpatial = children.get(0);
+
+        assert ((Node)charSpatial).getChild(0) instanceof Node; //controlled by AirSnowControl
     }
 
     @Override
@@ -138,5 +140,14 @@ public class FloatingControl extends AbstractPhysicsControl implements PhysicsTi
 
         var distanceResult = Helper.findClosestResult(loc, 100, rigidBody, true);
         distanceToGround = distanceResult.distance;
+    }
+
+
+    public static Spatial ConvertToFloatingSpatial(Node charNode) {
+        var charRootNode = new Node("Character root node"); // controlled by physics engine
+        var charControlNode = new Node("Character control node"); // controlled by floating Control
+        charRootNode.attachChild(charControlNode);
+        charControlNode.attachChild(charNode.getChild(0));
+        return charRootNode;
     }
 }

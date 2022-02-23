@@ -8,6 +8,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Node;
 
 import snower.player.BoardingUI;
+import snower.player.FloatingControl;
 import snower.player.FloatingSnowControl;
 import snower.player.PlayerInputs;
 import snower.player.SnowTrail;
@@ -39,7 +40,8 @@ public class GameState extends BaseAppState {
         app.getStateManager().attach(world);
 
         // new char
-        var controlNode2 = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
+        var z = ((Node)m.getAssetManager().loadModel("models/tinybuttanimate.gltf"));
+        var controlNode2 = FloatingControl.ConvertToFloatingSpatial(z);
         controlNode2.setLocalTranslation(world.startPos());
         controlNode2.setShadowMode(ShadowMode.CastAndReceive);
         
