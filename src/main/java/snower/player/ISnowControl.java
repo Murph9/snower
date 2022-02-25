@@ -7,6 +7,11 @@ public interface ISnowControl {
     boolean isOnGround();
     boolean isSwitch();
     boolean isCrashing();
+    boolean isDucked();
+    boolean isSlowing();
+    boolean isGrabbing();
+    GrabEnum getGrab();
+    TrickList getTrick();
 
     void turn(float amount);
     void jump(float amount);
@@ -18,7 +23,5 @@ public interface ISnowControl {
     void finishRail(boolean value);
 
     void grab(GrabEnum type);
-    TrickList getTrick();
-
     String getDebugStr();
 }

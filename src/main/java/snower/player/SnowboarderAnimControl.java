@@ -9,10 +9,21 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.scene.control.Control;
 
 import snower.player.GrabMapper.GrabEnum;
+import snower.service.Helper;
 
 public class SnowboarderAnimControl extends AbstractControl {
+
+    private final Class<? extends Control> controlClass;
+
+    public SnowboarderAnimControl() {
+        this(SnowboarderControl.class);
+    }
+    public SnowboarderAnimControl(Class<? extends Control> controlClass) {
+        this.controlClass = controlClass;
+    }
 
     @Override
     public void setSpatial(Spatial spatial) {
@@ -30,12 +41,14 @@ public class SnowboarderAnimControl extends AbstractControl {
         }
         System.out.println("Player has these animations: " + String.join(", ", anim.getAnimClipsNames()));
 
-        ((Node)spatial).getChild(0).setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y));
+        if (controlClass == SnowboarderControl.class)
+            ((Node)spatial).getChild(0).setLocalRotation(new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y));
     }
 
     @Override
     protected void controlUpdate(float tpf) {
-        var snower = spatial.getParent().getControl(SnowboarderControl.class);
+        var control = Helper.getControlFromParents(spatial, controlClass);
+        ISnowControl snower = (ISnowControl)control;
 
         if (!snower.isOnGround() && snower.isGrabbing())
             setPose(PlayerState.Grabbing, snower.getGrab());

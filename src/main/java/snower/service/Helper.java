@@ -7,6 +7,8 @@ import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.PhysicsRayTestResult;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.control.Control;
 
 import snower.base.Main;
 
@@ -78,5 +80,16 @@ public class Helper {
 
     public static Vector3f getXZNormalized(Vector3f in) {
         return new Vector3f(in.x, 0, in.z).normalize();
+    }
+
+    public static <T extends Control> T getControlFromParents(Spatial sp, Class<T> controlClass) {
+        T output = null;
+        var cur = sp;
+        while (output == null && cur != null) {
+            output = cur.getControl(controlClass);
+            cur = cur.getParent();
+        }
+
+        return output;
     }
 }
