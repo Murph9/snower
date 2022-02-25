@@ -15,6 +15,7 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
     private static final Quaternion ROT_Y_AXIS = new Quaternion().fromAngleAxis(-FastMath.HALF_PI, Vector3f.UNIT_Y);
 
     private static final float MASS = 80;
+    private static final float JUMP_FORCE = 5.5f;
     private static final float DUCK_SPEED = 1.2f;
     private static final float SLOPE_TURN_RATE = 0.25f;
     private static final float SLOW_RATE = 12;
@@ -33,7 +34,7 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
     public FloatingSnowControl(IWorld w) {
         super(MASS);
         this.w = w;
-        jumpForce = new Vector3f(0, rigidBody.getMass() * 5, 0);
+        jumpForce = new Vector3f(0, rigidBody.getMass() * JUMP_FORCE, 0);
 
         this.airControl = new AirSnowControl(this);
     }
@@ -118,19 +119,14 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
 
     @Override
     public void turn(float amount) {
-        if (this.isOnGround()) {
-            this.turnAmount = amount;
-            this.airControl.spin(0);
-        } else {
-            this.turnAmount = 0;
-            this.airControl.spin(amount);
-        }
+        this.turnAmount = amount;
+        this.airControl.spin(amount);
     }
 
     @Override
     public void jump(float amount) {
         if (isOnGround())
-            this.rigidBody.applyCentralImpulse(jumpForce);
+            this.rigidBody.applyCentralImpulse(jumpForce.mult(amount));
     }
 
     @Override
@@ -153,7 +149,8 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
 
     @Override
     public void setDucked(boolean value) {
-        ducked = value;
+        if (this.isOnGround())
+            ducked = value;
     }
 
     @Override

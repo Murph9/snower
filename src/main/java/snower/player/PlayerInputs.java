@@ -4,14 +4,18 @@ import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.math.FastMath;
 
 public class PlayerInputs implements ActionListener {
+
+    private static final float MAX_JUMP_TIME = 0.4f;
 
     private final InputManager im;
     private final ISnowControl snower;
     private final SnowboarderRailDetector railDetector;
 
     private GrabListener grabListener;
+    private long jumpTimer;
 
     public PlayerInputs(InputManager im, ISnowControl snower, SnowboarderRailDetector railDetector) {
         this.im = im;
@@ -57,7 +61,16 @@ public class PlayerInputs implements ActionListener {
                 snower.slow(0);
             }
         } else if (binding.equals("Space")) {
-            if (value) snower.jump(1);
+            if (!value) {
+                jumpTimer = System.currentTimeMillis() - jumpTimer;
+                // match range [0 - MAX_JUMP_TIME] => [min - 1]
+                var scaledValue = Math.min(jumpTimer/1000f, MAX_JUMP_TIME)/MAX_JUMP_TIME;
+                snower.jump(FastMath.extrapolateLinear(scaledValue, 0.65f, 1));
+                snower.setDucked(false);
+            } else {
+                jumpTimer = System.currentTimeMillis();
+                snower.setDucked(true);
+            }
         } else if (binding.equals("Reset")) {
             if (value) snower.reset();
         } else if (binding.equals("Rail")) {
