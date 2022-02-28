@@ -6,6 +6,7 @@ import java.util.List;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.PhysicsRayTestResult;
 import com.jme3.bullet.objects.PhysicsRigidBody;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.Control;
@@ -91,5 +92,9 @@ public class Helper {
         }
 
         return output;
+    }
+
+    public static <T> T randFromArray(T[] array) {
+        return array[FastMath.nextRandomInt(0, array.length - 1)];
     }
 }
