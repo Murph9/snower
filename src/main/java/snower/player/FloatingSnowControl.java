@@ -55,6 +55,7 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
         if (normal != null) {
             var mass = rigidBody.getMass();
             var gravityY = Math.abs(rigidBody.getGravity(null).y);
+            var speed = velocity.length();
 
             // calc forward vector (ignoring vertical component)
             forward = rigidBody.getLinearVelocity().normalize();
@@ -65,23 +66,26 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
 
             float duckOffset = ducked ? DUCK_SPEED : 1;
 
-            // a gravity force from the combined direction, Mass, gravity and time step
-            // rigidBody.getLinearVelocity() is wrong here, but to help falling physics its here
+            // a gravity force from the combined direction, Mass, gravity and time step (not technically correct math here)
             rigidBody.applyCentralImpulse(forward.mult(duckOffset * gravityY * mass * projVel * tpf));
 
-            if (FastMath.approximateEquals(slowed, 0)) {
+            if (speed > 3) {
                 // rotate character naturally down the slope
                 rigidBody.applyCentralImpulse(side.mult(SLOPE_TURN_RATE * gravityY * mass * projSlip * tpf));
                 // NOTE: add turning drag so this doesn't add speed
-            } else {
-                // just normal drag
+            }
+            
+            if (!FastMath.approximateEquals(slowed, 0)) {
+                // apply manual drag
                 float speedReduction = slowed*SLOW_RATE;
-                float speed = velocity.length();
                 rigidBody.applyCentralForce(velocity.normalize().multLocal(-gravityY*speed*speedReduction*mass*tpf));
+            } else {
+                // apply natural drag
+                rigidBody.applyCentralForce(velocity.normalize().multLocal(-gravityY*speed*0.75f*mass*tpf));
             }
 
             if (turnAmount != 0) {
-                var vel = Math.min(velocity.length(), 5)/5f; //prevent high speed turning at slow speeds
+                var vel = Math.min(velocity.length(), 5)/5f; // prevent high speed turning at slow speeds
                 rigidBody.applyCentralImpulse(side.mult(-turnAmount * vel * gravityY * mass * tpf));
             }
         }
@@ -145,6 +149,7 @@ public class FloatingSnowControl extends FloatingControl implements ISnowControl
     @Override
     public void reset() {
         setPhysicsLocation(w.startPos());
+        rigidBody.setLinearVelocity(new Vector3f());
     }
 
     @Override
